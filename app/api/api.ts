@@ -56,7 +56,12 @@ export async function loginUser(formData: LgForm) {
     return data;
 }
 
-
+export type UserForm = {
+    name: string;
+    email: string;
+    password: string;
+    banStatus: string;
+};
 export async function getUserList() {
     return authenticatedFetch("/api/admin/user/list", {
         method: "GET",
