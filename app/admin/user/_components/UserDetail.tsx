@@ -52,7 +52,7 @@ export default function UserDetailModal({ user, onClose, onDelete, onUpdate }: U
                             <input
                                 type="text"
                                 name={key}
-                                value={formData[key]}
+                                value={formData[key] ?? ""}
                                 onChange={handleChange}
                                 className="w-full border rounded px-2 py-1 mt-1"
                             />

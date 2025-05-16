@@ -76,3 +76,24 @@ export async function getUserById(id: number) {
         },
     });
 }
+
+export async function deleteUserById(id: number) {
+    const url = `/api/admin/user?user_id=${encodeURIComponent(id)}`;
+    return authenticatedFetch(url, {
+        method: "DELETE",
+        headers: {
+            'Content-Type': 'application/json',
+        }
+    })
+}
+
+export async function updateUserById(id: number, formData: RegisterForm) {
+    const url = `/api/admin/user?user_id=${encodeURIComponent(id)}`;
+    return authenticatedFetch(url, {
+        method: "PUT",
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+    })
+}
