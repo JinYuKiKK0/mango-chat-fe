@@ -57,11 +57,22 @@ export async function loginUser(formData: LgForm) {
 }
 
 
-export async function testGetUser() {
-    return authenticatedFetch("/api/users", {
+export async function getUserList() {
+    return authenticatedFetch("/api/admin/user/list", {
         method: "GET",
         headers: {
             'Content-Type': 'application/json',
         },
     })
+}
+
+export async function getUserById(id: number) {
+    const url = `/api/admin/user?user_id=${encodeURIComponent(id)}`;
+
+    return authenticatedFetch(url, {
+        method: "GET",
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    });
 }

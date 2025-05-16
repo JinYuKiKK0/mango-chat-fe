@@ -24,10 +24,25 @@ const menuAside: MenuAsideItem[] = [
     label: "Dashboard",
   },
   {
-    href: "/dashboard/tables",
-    label: "UserManagement",
-    icon: mdiTable,
+    label: "后台管理",
+    icon: mdiViewList,
+    menu: [
+      {
+        href: "/admin/user",
+        label: "用户管理",
+        icon: mdiTable,
+      },
+      {
+        label: "公告管理",
+        icon: mdiAccountCircle,
+      },
+      {
+        label: "Tips管理 ",
+        icon: mdiTable,
+      },
+    ],
   },
+
   {
     href: "/dashboard/forms",
     label: "Forms",
@@ -59,18 +74,7 @@ const menuAside: MenuAsideItem[] = [
     label: "Error",
     icon: mdiAlertCircle,
   },
-  {
-    label: "Dropdown",
-    icon: mdiViewList,
-    menu: [
-      {
-        label: "Item One",
-      },
-      {
-        label: "Item Two",
-      },
-    ],
-  },
+
 ];
 
 export default menuAside;
