@@ -3,7 +3,6 @@
 import React, {useEffect, useState} from "react";
 import { Box, Button, Card, CardContent, TextField, Typography, Divider, List, ListItem, ListItemText, ListItemButton } from "@mui/material";
 import {width} from "@mui/system";
-import {testGetUser} from "../api/api"
 
 
 
@@ -32,7 +31,6 @@ export default function BasicChatPage() {
         const newMessages = [...messages, { role: "user" as const, content: input }];
         setMessages([...newMessages, { role: "assistant" as const, content: "模拟回复内容" }]);
         setInput("");
-        testGetUser();
 
     };
 
