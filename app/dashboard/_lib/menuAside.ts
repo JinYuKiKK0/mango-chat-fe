@@ -33,10 +33,12 @@ const menuAside: MenuAsideItem[] = [
         icon: mdiTable,
       },
       {
+        href: "/admin/announcements",
         label: "公告管理",
         icon: mdiAccountCircle,
       },
       {
+        href: "/admin/tips",
         label: "Tips管理 ",
         icon: mdiTable,
       },
