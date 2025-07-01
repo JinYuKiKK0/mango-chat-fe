@@ -12,10 +12,11 @@ import NotificationBar from "../../../_components/NotificationBar";
 import SectionMain from "../../../_components/Section/Main";
 import SectionTitleLineWithButton from "../../../_components/Section/TitleLineWithButton";
 import TableGeneric from "../_components/GeneralTable";
-import {deleteUserById, getUserById, getUserList, updateUserById} from "../../../api/api";
+import {deleteUserById, getUserById, getUserList, updateUserById,createUser} from "../../../api/api";
 import { useEffect, useState } from "react";
 import UserDetailModal from './UserDetail';
 
+//组件定义与状态管理
 export default function TablesClient() {
 
     // fetch user
