@@ -420,7 +420,7 @@ export interface Announcement {
   }
 
   //3.4.1.0 获取api-key列表
-  export async function getApiKeyList(page: number = 0, pageSize: number = 10): Promise<ApiKeyListResponse> {
+  export async function getApiKeyList(page: number = 0, pageSize: number = 10): Promise<any> {
     const url = `/api/admin/apikey/list?page=${encodeURIComponent(page)}&pageSize=${encodeURIComponent(pageSize)}`;
     return authenticatedFetch(url, {
       method: "GET",

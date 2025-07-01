@@ -9,6 +9,10 @@ import {
   mdiTelevisionGuide,
   mdiResponsive,
   mdiChat,
+  mdiShield,
+  mdiAccountGroup,
+  mdiAccountMultiple,
+  mdiKey,
 } from "@mdi/js";
 import { MenuAsideItem } from "../../_interfaces";
 
@@ -41,6 +45,26 @@ const menuAside: MenuAsideItem[] = [
         href: "/admin/tips",
         label: "Tips管理 ",
         icon: mdiTable,
+      },
+      {
+        href: "/admin/api-keys",
+        label: "API-Key",
+        icon: mdiKey,
+      },
+      {
+        href: "/admin/permissions",
+        label: "权限管理",
+        icon: mdiShield,
+      },
+      {
+        href: "/admin/roles",
+        label: "角色管理",
+        icon: mdiAccountGroup,
+      },
+      {
+        href: "/admin/groups",
+        label: "群组管理",
+        icon: mdiAccountMultiple,
       },
     ],
   },
