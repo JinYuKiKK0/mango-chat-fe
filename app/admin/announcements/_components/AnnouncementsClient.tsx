@@ -28,26 +28,29 @@ export default function AnnouncementsClient() {
             const response = await getAnnouncementList(); 
             console.log("公告列表返回:", response);
 
-            
-            // The API response for getAnnouncementList is expected to be AnnouncementListResponse
-            // which contains content, page, pageSize, totalElements, totalPages.
-            // It does not contain a 'column' field. Column definitions should be static here.
-            if (response && response.content) {
+            // 后端返回格式: { code: 200, message: "查询成功", data: { content: [...], page, pageSize, totalElements, totalPages }, column: [...] }
+            if (response && response.code === 200 && response.data && Array.isArray(response.data.content)) {
+                // 处理列配置：将后端返回的 column 数组转换为前端期望的格式
+                const columns = response.column ? response.column.map((col: any) => ({
+                    key: col.column,
+                    title: col.value
+                })) : [
+                    { key: 'title', title: '标题' },
+                    { key: 'effectiveTime', title: '生效时间' },
+                    { key: 'expirationTime', title: '过期时间' },
+                    { key: 'createdAt', title: '创建时间' },
+                ];
+
                 setTableData({
-                    data: response.content,
-                    column: [ 
-                        { key: 'title', title: '标题' },
-                        { key: 'effectiveTime', title: '生效时间' },
-                        { key: 'expirationTime', title: '失效时间' },
-                        { key: 'createdAt', title: '创建时间' },
-                    ]
+                    data: response.data.content,
+                    column: columns
                 });
             } else {
                 console.error("API 返回格式不正确或无数据:", response);
                 setTableData({ data: [], column: [
                     { key: 'title', title: '标题' },
                     { key: 'effectiveTime', title: '生效时间' },
-                    { key: 'expirationTime', title: '失效时间' },
+                    { key: 'expirationTime', title: '过期时间' },
                     { key: 'createdAt', title: '创建时间' },
                 ] }); // Set empty data with default columns on error
             }
@@ -56,7 +59,7 @@ export default function AnnouncementsClient() {
             setTableData({ data: [], column: [
                 { key: 'title', title: '标题' },
                 { key: 'effectiveTime', title: '生效时间' },
-                { key: 'expirationTime', title: '失效时间' },
+                { key: 'expirationTime', title: '过期时间' },
                 { key: 'createdAt', title: '创建时间' },
             ] }); // Set empty data with default columns on error
         }
@@ -119,7 +122,6 @@ export default function AnnouncementsClient() {
                         setEditingAnnouncement(null); // Clear any editing state
                         setShowFormModal(true); // Show the form for new announcement
                     }}
-                    small // Optional: if you want a smaller button
                 />
             </SectionTitleLineWithButton>
 

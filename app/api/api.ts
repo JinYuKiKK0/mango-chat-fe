@@ -252,6 +252,26 @@ export interface Announcement {
     updatedAt: string;
   }
   
+  // 通用API响应格式
+  export interface ApiResponse<T> {
+    code: number;
+    message: string;
+    data: T;
+    column?: Array<{
+      column: string;
+      value: string;
+    }>;
+  }
+
+  // 分页数据格式
+  export interface PagedData<T> {
+    content: T[];
+    page: number;
+    pageSize: number;
+    totalElements: number;
+    totalPages: number;
+  }
+
   export interface AnnouncementListResponse {
     content: Announcement[];
     page: number;
@@ -268,7 +288,7 @@ export interface Announcement {
   }
   
   // 3.3.1.0 查询公告列表
-  export async function getAnnouncementList(page: number = 0, pageSize: number = 10): Promise<AnnouncementListResponse> {
+  export async function getAnnouncementList(page: number = 0, pageSize: number = 10): Promise<ApiResponse<PagedData<Announcement>>> {
     const url = `/api/admin/announcement/list?page=${encodeURIComponent(page)}&pageSize=${encodeURIComponent(pageSize)}`;
     return authenticatedFetch(url, {
       method: "GET",
@@ -346,9 +366,8 @@ export interface Announcement {
   }
   
   // 3.3.2.0 查询Tips列表
-  export async function getTipList(page: number = 0, pageSize: number = 10): Promise<TipListResponse> {
+  export async function getTipList(page: number = 0, pageSize: number = 10): Promise<ApiResponse<PagedData<Tip>>> {
     const url = `/api/admin/tips/list?page=${encodeURIComponent(page)}&pageSize=${encodeURIComponent(pageSize)}`;
-    // Assuming authenticatedFetch returns the `data` part.
     return authenticatedFetch(url, {
       method: "GET",
       headers: {
