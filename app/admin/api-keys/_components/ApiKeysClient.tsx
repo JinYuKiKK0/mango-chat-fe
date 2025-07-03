@@ -49,7 +49,7 @@ export default function ApiKeysClient() {
     };
 
     const handleCreateApiKey = () => {
-        setSelectedApiKey({ name: '' });
+        setSelectedApiKey({ name: '', apiKey: '' });
         setIsCreating(true);
         setShowModal(true);
         setNewlyCreatedKey(null);
@@ -68,7 +68,10 @@ export default function ApiKeysClient() {
     const handleSaveApiKey = async (apiKeyData: any) => {
         try {
             if (isCreating) {
-                const response = await createApiKey({ name: apiKeyData.name });
+                const response = await createApiKey({ 
+                    name: apiKeyData.name,
+                    apiKey: apiKeyData.apiKey 
+                });
                 if (response.code === 200 && response.data?.apiKey) {
                     setNewlyCreatedKey(response.data.apiKey);
                 }

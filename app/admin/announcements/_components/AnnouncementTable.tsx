@@ -2,67 +2,135 @@
 
 'use client';
 
-import { mdiEye, mdiTrashCan, mdiSquareEditOutline } from '@mdi/js';
-import React from 'react';
+import { mdiEye, mdiTrashCan, mdiSquareEditOutline, mdiBullhornVariant } from '@mdi/js';
+import React, { useState } from 'react';
 import Buttons from '../../../_components/Buttons';
-import Icon from '../../../_components/Icon';
+import Button from '../../../_components/Button';
 
 interface AnnouncementTableProps {
   data: any[];
   column: { key: string; title: string }[];
   onView: (item: any) => void;
   onDelete: (itemId: number) => void;
-  onUpdate: (item: any) => void; // To initiate editing, likely opening a form/modal
+  onUpdate: (item: any) => void;
 }
 
 const AnnouncementTable: React.FC<AnnouncementTableProps> = ({ data, column, onView, onDelete, onUpdate }) => {
+  const perPage = 10;
+  const [currentPage, setCurrentPage] = useState(0);
+
+  const dataPaginated = data.slice(
+    currentPage * perPage,
+    (currentPage + 1) * perPage
+  );
+
+  const numPages = Math.ceil(data.length / perPage);
+  const pagesList: number[] = Array.from({ length: numPages }, (_, i) => i);
+
+  const formatDate = (dateString?: string) => {
+    if (!dateString) return '-';
+    try {
+      return new Date(dateString).toLocaleDateString('zh-CN');
+    } catch {
+      return dateString;
+    }
+  };
+
+  const formatCellValue = (value: any, columnKey: string) => {
+    if (columnKey.includes('At') || columnKey.includes('Time')) {
+      return formatDate(value);
+    }
+    return value || '-';
+  };
+
   if (!data || data.length === 0) {
     return <p className="text-center text-gray-500 py-4">暂无公告数据</p>;
   }
 
   return (
-    <table className="min-w-full divide-y divide-gray-200">
-      <thead className="bg-gray-50">
-        <tr>
-          {column.map((col) => (
-            <th
-              key={col.key}
-              scope="col"
-              className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-            >
-              {col.title}
-            </th>
-          ))}
-          <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-            操作
-          </th>
-        </tr>
-      </thead>
-      <tbody className="bg-white divide-y divide-gray-200">
-        {data.map((item) => (
-          <tr key={item.id}>
+    <>
+      <table>
+        <thead>
+          <tr>
             {column.map((col) => (
-              <td key={col.key} className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                {item[col.key]}
-              </td>
+              <th key={col.key}>{col.title}</th>
             ))}
-            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-              <Buttons type="justify-start lg:justify-end" noWrap>
-                <button onClick={() => onView(item)} className="text-blue-600 hover:text-blue-900 mr-2">
-                  <Icon path={mdiEye} size={20} />
-                </button>
-                <button onClick={() => onUpdate(item)} className="text-yellow-600 hover:text-yellow-900 mr-2">
-                  <Icon path={mdiSquareEditOutline} size={20} />
-                </button>
-                <button onClick={() => onDelete(item.id)} className="text-red-600 hover:text-red-900">
-                  <Icon path={mdiTrashCan} size={20} />
-                </button>
-              </Buttons>
-            </td>
+            <th>操作</th>
           </tr>
-        ))}
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          {dataPaginated.map((item) => (
+            <tr key={item.id}>
+              {column.map((col) => (
+                <td key={col.key} data-label={col.title}>
+                  {col.key === 'title' ? (
+                    <div className="flex items-center">
+                      <Button
+                        icon={mdiBullhornVariant}
+                        color="whiteDark"
+                        small
+                        className="mr-2"
+                      />
+                      {item[col.key]}
+                    </div>
+                  ) : (
+                    formatCellValue(item[col.key], col.key)
+                  )}
+                </td>
+              ))}
+              <td className="before:hidden lg:w-1 whitespace-nowrap">
+                <Buttons type="justify-start lg:justify-end" noWrap>
+                  <Button
+                    color="info"
+                    icon={mdiEye}
+                    onClick={() => onView(item)}
+                    small
+                    isGrouped
+                  />
+                  <Button
+                    color="warning"
+                    icon={mdiSquareEditOutline}
+                    onClick={() => onUpdate(item)}
+                    small
+                    isGrouped
+                  />
+                  <Button
+                    color="danger"
+                    icon={mdiTrashCan}
+                    onClick={() => onDelete(item.id)}
+                    small
+                    isGrouped
+                  />
+                </Buttons>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+
+      <div className="p-3 lg:px-6 border-t border-gray-100 dark:border-slate-800">
+        <div className="flex flex-col md:flex-row items-center justify-between py-3 md:py-0">
+          {numPages > 1 && (
+            <Buttons>
+              {pagesList.map((page) => (
+                <Button
+                  key={page}
+                  active={page === currentPage}
+                  label={(page + 1).toString()}
+                  color={page === currentPage ? "lightDark" : "whiteDark"}
+                  small
+                  onClick={() => setCurrentPage(page)}
+                  isGrouped
+                />
+              ))}
+            </Buttons>
+          )}
+          <small className="mt-6 md:mt-0">
+            第 {currentPage + 1} 页，共 {numPages} 页
+          </small>
+        </div>
+      </div>
+    </>
   );
 };
 

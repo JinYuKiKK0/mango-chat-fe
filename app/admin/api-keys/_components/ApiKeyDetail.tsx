@@ -42,6 +42,10 @@ export default function ApiKeyDetailModal({
             alert("名称不能为空");
             return;
         }
+        if (isCreating && !formData.apiKey) {
+            alert("API Key不能为空");
+            return;
+        }
         onSave(formData);
     };
 
@@ -117,8 +121,23 @@ export default function ApiKeyDetailModal({
                     />
                 </div>
 
-                {!isCreating && (
-                     <div>
+                {isCreating ? (
+                    <div>
+                        <label className="block text-sm font-semibold">API Key</label>
+                        <input
+                            type="text"
+                            name="apiKey"
+                            value={formData.apiKey ?? ''}
+                            onChange={handleChange}
+                            className="w-full border rounded px-2 py-1 mt-1 font-mono"
+                            placeholder="输入API Key值"
+                        />
+                        <p className="text-sm text-gray-500 mt-1">
+                            请输入完整的API Key值，保存后将无法再次查看完整内容
+                        </p>
+                    </div>
+                ) : (
+                    <div>
                         <label className="block text-sm font-semibold">API Key (部分)</label>
                         <p className="border rounded px-2 py-1 mt-1 bg-gray-100 font-mono">
                             {`${formData.apiKey.substring(0, 4)}...${formData.apiKey.substring(formData.apiKey.length - 4)}`}

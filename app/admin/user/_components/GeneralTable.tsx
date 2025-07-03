@@ -5,7 +5,7 @@
 import React, { useState } from "react";
 import Buttons from "../../../_components/Buttons";
 import Button from "../../../_components/Button";
-import { mdiEye, mdiTrashCan } from "@mdi/js";
+import { mdiEye, mdiTrashCan, mdiAccount } from "@mdi/js";
 
 // 类型定义，表示传入的数据格式
 type RawRow = {
@@ -27,7 +27,7 @@ type Props = {
 
 
 const TableGeneric = ({ data, column, onView, onDelete, onUpdate }: Props) => {
-    const perPage = 5;
+    const perPage = 10;
 
     const numPages = Math.ceil(data.length / perPage);
     const pagesList: number[] = Array.from({ length: numPages }, (_, i) => i);
@@ -38,6 +38,22 @@ const TableGeneric = ({ data, column, onView, onDelete, onUpdate }: Props) => {
         currentPage * perPage,
         (currentPage + 1) * perPage
     );
+
+    const formatDate = (dateString?: string) => {
+        if (!dateString) return '-';
+        try {
+            return new Date(dateString).toLocaleDateString('zh-CN');
+        } catch {
+            return dateString;
+        }
+    };
+
+    const formatCellValue = (value: any, columnKey: string) => {
+        if (columnKey.includes('At') || columnKey.includes('Time') || columnKey.includes('time')) {
+            return formatDate(value);
+        }
+        return value || '-';
+    };
 
     return (
         <>
@@ -57,7 +73,7 @@ const TableGeneric = ({ data, column, onView, onDelete, onUpdate }: Props) => {
                 {dataPaginated.length === 0 ? (
                     <tr>
                         <td colSpan={column.length + 1} className="text-center">
-                            No data available.
+                            暂无用户数据
                         </td>
                     </tr>
                 ) : (
@@ -66,7 +82,19 @@ const TableGeneric = ({ data, column, onView, onDelete, onUpdate }: Props) => {
                             {/* 对每个 column，从 row 中取对应的值 */}
                             {column.map((colDef, colIndex) => (
                                 <td key={colIndex} data-label={colDef.value}>
-                                    {row[colDef.column] ?? ""}
+                                    {colDef.column === 'name' ? (
+                                        <div className="flex items-center">
+                                            <Button
+                                                icon={mdiAccount}
+                                                color="whiteDark"
+                                                small
+                                                className="mr-2"
+                                            />
+                                            {row[colDef.column] || '-'}
+                                        </div>
+                                    ) : (
+                                        formatCellValue(row[colDef.column], colDef.column)
+                                    )}
                                 </td>
                             ))}
 
@@ -114,7 +142,7 @@ const TableGeneric = ({ data, column, onView, onDelete, onUpdate }: Props) => {
                         </Buttons>
                     )}
                     <small className="mt-6 md:mt-0">
-                        Page {currentPage + 1} of {numPages}
+                        第 {currentPage + 1} 页，共 {numPages} 页
                     </small>
                 </div>
             </div>

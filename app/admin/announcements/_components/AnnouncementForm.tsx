@@ -3,6 +3,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Button from '../../../_components/Button';
 
 interface AnnouncementFormProps {
   initialData?: any; // For editing existing announcements
@@ -38,11 +39,11 @@ const AnnouncementForm: React.FC<AnnouncementFormProps> = ({ initialData, onSubm
   };
 
   return (
-    <div className="fixed inset-0 backdrop-blur-sm bg-black bg-opacity-30 flex justify-center items-center z-50">
+    <div className="fixed inset-0 backdrop-blur-sm bg-white/30 flex justify-center items-center z-50">
       <div className="bg-white rounded-xl shadow-lg p-6 w-full max-w-lg space-y-4 relative">
         <button
           onClick={onCancel}
-          className="absolute top-3 right-4 text-gray-500 hover:text-gray-700 text-xl"
+          className="absolute top-2 right-3 text-gray-500 hover:text-gray-700 text-lg"
         >
           ✕
         </button>
@@ -79,20 +80,17 @@ const AnnouncementForm: React.FC<AnnouncementFormProps> = ({ initialData, onSubm
             />
           </div>
           {/* Add other form fields here as needed */}
-          <div className="flex justify-end space-x-3 pt-4">
-            <button
-              type="button"
+          <div className="flex justify-end space-x-2 pt-4">
+            <Button
+              label="取消"
+              color="white"
               onClick={onCancel}
-              className="bg-gray-300 hover:bg-gray-400 text-black px-4 py-2 rounded transition duration-150 ease-in-out"
-            >
-              取消
-            </button>
-            <button
-              type="submit"
-              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded transition duration-150 ease-in-out"
-            >
-              {initialData ? '保存更改' : '创建公告'}
-            </button>
+            />
+            <Button
+              label={initialData ? '保存更改' : '创建公告'}
+              color="info"
+              onClick={handleSubmit}
+            />
           </div>
         </form>
       </div>

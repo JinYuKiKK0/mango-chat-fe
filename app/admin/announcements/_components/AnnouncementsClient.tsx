@@ -30,27 +30,29 @@ export default function AnnouncementsClient() {
 
             // 后端返回格式: { code: 200, message: "查询成功", data: { content: [...], page, pageSize, totalElements, totalPages }, column: [...] }
             if (response && response.code === 200 && response.data && Array.isArray(response.data.content)) {
+                const rawData = response.data.content;
                 // 处理列配置：将后端返回的 column 数组转换为前端期望的格式
                 const columns = response.column ? response.column.map((col: any) => ({
                     key: col.column,
                     title: col.value
                 })) : [
                     { key: 'title', title: '标题' },
-                    { key: 'effectiveTime', title: '生效时间' },
-                    { key: 'expirationTime', title: '过期时间' },
                     { key: 'createdAt', title: '创建时间' },
                 ];
 
+                // 若某些列在所有数据项中均不存在(值为 undefined 或 null)，则过滤掉这些列
+                const filteredColumns = columns.filter((col: any) =>
+                    rawData.some((item: any) => item[col.key] !== undefined && item[col.key] !== null)
+                );
+
                 setTableData({
-                    data: response.data.content,
-                    column: columns
+                    data: rawData,
+                    column: filteredColumns
                 });
             } else {
                 console.error("API 返回格式不正确或无数据:", response);
                 setTableData({ data: [], column: [
                     { key: 'title', title: '标题' },
-                    { key: 'effectiveTime', title: '生效时间' },
-                    { key: 'expirationTime', title: '过期时间' },
                     { key: 'createdAt', title: '创建时间' },
                 ] }); // Set empty data with default columns on error
             }
@@ -58,8 +60,6 @@ export default function AnnouncementsClient() {
             console.error("获取公告数据失败:", error);
             setTableData({ data: [], column: [
                 { key: 'title', title: '标题' },
-                { key: 'effectiveTime', title: '生效时间' },
-                { key: 'expirationTime', title: '过期时间' },
                 { key: 'createdAt', title: '创建时间' },
             ] }); // Set empty data with default columns on error
         }
