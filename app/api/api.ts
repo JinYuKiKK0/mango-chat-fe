@@ -633,13 +633,14 @@ export interface Announcement {
   }
   //4.3.3 根据角色id批量删除权限
   export async function deleteRolePermission(id: number, permissionIds: number[]){
-    return authenticatedFetch(`/api/admin/role/${id}/permissions`,{
-      method: "DELETE",
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(permissionIds),
-    })
+    const url = `/api/admin/role/${id}/permissions`;
+    return authenticatedFetch(url, {
+        method: "DELETE",
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(permissionIds),
+    });
   }
   //4.4 用户组管理
   export interface UserGroupForm{
@@ -782,4 +783,14 @@ export interface Announcement {
       },
       body: JSON.stringify(roleIds),
     })
+  }
+
+  export async function getRoleTypes() {
+    const url = `/api/admin/role/types`;
+    return authenticatedFetch(url, {
+        method: "GET",
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    });
   }

@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Buttons from "../../../_components/Buttons";
 import Button from "../../../_components/Button";
 import { mdiEye, mdiTrashCan, mdiShieldAccount } from "@mdi/js";
+import { getRoleTypes } from "../../../api/api";
 
 type RoleRow = {
     id: number;
@@ -28,6 +29,7 @@ type Props = {
 
 const RoleTable = ({ data, column, onView, onDelete }: Props) => {
     const perPage = 10;
+    const [roleTypes, setRoleTypes] = useState<{value: number; label: string}[]>([]);
 
     const numPages = Math.ceil(data.length / perPage);
     const pagesList: number[] = Array.from({ length: numPages }, (_, i) => i);
@@ -39,13 +41,24 @@ const RoleTable = ({ data, column, onView, onDelete }: Props) => {
         (currentPage + 1) * perPage
     );
 
+    useEffect(() => {
+        fetchRoleTypes();
+    }, []);
+
+    const fetchRoleTypes = async () => {
+        try {
+            const response = await getRoleTypes();
+            if (response.code === 200) {
+                setRoleTypes(response.data || []);
+            }
+        } catch (error) {
+            console.error('获取角色类型失败:', error);
+        }
+    };
+
     const formatRoleType = (type: number) => {
-        const types: { [key: number]: string } = {
-            0: '普通角色',
-            1: '管理员角色',
-            2: '超级管理员'
-        };
-        return types[type] || '未知类型';
+        const roleType = roleTypes.find(rt => rt.value === type);
+        return roleType ? roleType.label : '未知类型';
     };
 
     return (
@@ -56,7 +69,7 @@ const RoleTable = ({ data, column, onView, onDelete }: Props) => {
                     <th>ID</th>
                     <th>角色名称</th>
                     <th>角色类型</th>
-                    <th>等级</th>
+                    <th>优先级</th>
                     <th>自动分配</th>
                     <th>操作</th>
                 </tr>
@@ -84,7 +97,7 @@ const RoleTable = ({ data, column, onView, onDelete }: Props) => {
                                 </div>
                             </td>
                             <td data-label="角色类型">{formatRoleType(row.roleType)}</td>
-                            <td data-label="等级">{row.rank}</td>
+                            <td data-label="优先级">{row.rank}</td>
                             <td data-label="自动分配">
                                 <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
                                     row.autoAdd ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'

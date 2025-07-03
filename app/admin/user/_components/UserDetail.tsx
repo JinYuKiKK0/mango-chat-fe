@@ -3,7 +3,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { getUserRole, addUserRole, deleteUserRole, getRoleList } from '../../../api/api';
+import { getUserRole, addUserRole, deleteUserRole, getRoleList, getRoleTypes } from '../../../api/api';
 import Button from '../../../_components/Button';
 import { mdiPlus, mdiDelete, mdiCheck } from '@mdi/js';
 
@@ -24,12 +24,14 @@ export default function UserDetailModal({ user, onClose, onDelete, onUpdate }: U
     const [allRoles, setAllRoles] = useState<any[]>([]);
     const [selectedRoles, setSelectedRoles] = useState<number[]>([]);
     const [showAddRoles, setShowAddRoles] = useState(false);
+    const [roleTypes, setRoleTypes] = useState<{value: number; label: string}[]>([]);
 
     useEffect(() => {
         setFormData(user);
         if (user?.id) {
             fetchUserRoles();
         }
+        fetchRoleTypes();
     }, [user]);
 
     const fetchUserRoles = async () => {
@@ -61,6 +63,17 @@ export default function UserDetailModal({ user, onClose, onDelete, onUpdate }: U
             }
         } catch (error) {
             console.error('获取角色列表失败:', error);
+        }
+    };
+
+    const fetchRoleTypes = async () => {
+        try {
+            const response = await getRoleTypes();
+            if (response.code === 200) {
+                setRoleTypes(response.data || []);
+            }
+        } catch (error) {
+            console.error('获取角色类型失败:', error);
         }
     };
 
@@ -113,6 +126,11 @@ export default function UserDetailModal({ user, onClose, onDelete, onUpdate }: U
     const availableRoles = allRoles.filter(role => 
         !userRoles.some(userRole => userRole.id === role.id)
     );
+
+    const formatRoleType = (type: number) => {
+        const roleType = roleTypes.find(rt => rt.value === type);
+        return roleType ? roleType.label : '未知';
+    };
 
     return (
         <div className="fixed inset-0 backdrop-blur-sm bg-white/30 flex justify-center items-center z-50">
@@ -201,11 +219,7 @@ export default function UserDetailModal({ user, onClose, onDelete, onUpdate }: U
                                                 <div>
                                                     <span className="font-medium">{role.name}</span>
                                                     <span className="ml-4 text-sm text-gray-600">
-                                                        等级: {role.rank} | 类型: {
-                                                            role.roleType === 0 ? '普通角色' :
-                                                            role.roleType === 1 ? '管理员角色' :
-                                                            role.roleType === 2 ? '超级管理员' : '未知'
-                                                        }
+                                                        优先级: {role.rank} | 类型: {formatRoleType(role.roleType)}
                                                     </span>
                                                 </div>
                                                 <Button
@@ -248,11 +262,7 @@ export default function UserDetailModal({ user, onClose, onDelete, onUpdate }: U
                                                     <div>
                                                         <span className="font-medium">{role.name}</span>
                                                         <span className="ml-4 text-sm text-gray-600">
-                                                            等级: {role.rank} | 类型: {
-                                                                role.roleType === 0 ? '普通角色' :
-                                                                role.roleType === 1 ? '管理员角色' :
-                                                                role.roleType === 2 ? '超级管理员' : '未知'
-                                                            }
+                                                            优先级: {role.rank} | 类型: {formatRoleType(role.roleType)}
                                                         </span>
                                                     </div>
                                                 </div>

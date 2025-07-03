@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { getRolePermissionList, addRolePermission, deleteRolePermission, getPermissionList } from '../../../api/api';
+import { getRolePermissionList, addRolePermission, deleteRolePermission, getPermissionList, getRoleTypes } from '../../../api/api';
 import Button from '../../../_components/Button';
 import { mdiPlus, mdiDelete, mdiCheck } from '@mdi/js';
 
@@ -29,6 +29,7 @@ export default function RoleDetailModal({
     const [allPermissions, setAllPermissions] = useState<any[]>([]);
     const [selectedPermissions, setSelectedPermissions] = useState<number[]>([]);
     const [showAddPermissions, setShowAddPermissions] = useState(false);
+    const [roleTypes, setRoleTypes] = useState<{value: number; label: string}[]>([]);
 
     useEffect(() => {
         setFormData(role);
@@ -36,6 +37,7 @@ export default function RoleDetailModal({
         if (!isCreating && role?.id) {
             fetchRolePermissions();
         }
+        fetchRoleTypes();
     }, [role, isCreating]);
 
     const fetchRolePermissions = async () => {
@@ -46,6 +48,17 @@ export default function RoleDetailModal({
             }
         } catch (error) {
             console.error('获取角色权限失败:', error);
+        }
+    };
+
+    const fetchRoleTypes = async () => {
+        try {
+            const response = await getRoleTypes();
+            if (response.code === 200) {
+                setRoleTypes(response.data || []);
+            }
+        } catch (error) {
+            console.error('获取角色类型失败:', error);
         }
     };
 
@@ -110,12 +123,6 @@ export default function RoleDetailModal({
                 : [...prev, permissionId]
         );
     };
-
-    const roleTypes = [
-        { value: 0, label: '普通角色' },
-        { value: 1, label: '管理员角色' },
-        { value: 2, label: '超级管理员' },
-    ];
 
     const availablePermissions = allPermissions.filter(permission => 
         !rolePermissions.some(rp => rp.id === permission.id)
@@ -216,7 +223,7 @@ export default function RoleDetailModal({
                             </div>
 
                             <div>
-                                <label className="block text-sm font-semibold">等级</label>
+                                <label className="block text-sm font-semibold">优先级</label>
                                 {isEditing ? (
                                     <input
                                         type="number"

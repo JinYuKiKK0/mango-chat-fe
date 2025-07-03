@@ -426,7 +426,7 @@ export default function GroupDetailModal({
                                             <div key={role.id} className="flex justify-between items-center p-2 bg-gray-50 rounded">
                                                 <div>
                                                     <span className="font-medium">{role.name}</span>
-                                                    <span className="ml-4 text-sm text-gray-600">等级: {role.rank}</span>
+                                                    <span className="ml-4 text-sm text-gray-600">优先级: {role.rank}</span>
                                                 </div>
                                                 <Button
                                                     icon={mdiDelete}
@@ -467,7 +467,7 @@ export default function GroupDetailModal({
                                                     />
                                                     <div>
                                                         <span className="font-medium">{role.name}</span>
-                                                        <span className="ml-4 text-sm text-gray-600">等级: {role.rank}</span>
+                                                        <span className="ml-4 text-sm text-gray-600">优先级: {role.rank}</span>
                                                     </div>
                                                 </div>
                                             ))
