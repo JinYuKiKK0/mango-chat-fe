@@ -119,16 +119,16 @@ export default function RoleDetailModal({
                 await fetchRolePermissions();
             },
             onRemove: async (permissionId: number) => {
-                await deleteRolePermission(role.id, [permissionId]);
-                await fetchRolePermissions();
+            await deleteRolePermission(role.id, [permissionId]);
+            await fetchRolePermissions();
             },
             customRenderer: (permission: any) => (
-                <div>
-                    <span className="font-medium">权限ID: {permission.id}</span>
-                    <span className="ml-4 text-sm text-gray-600">
-                        {permission.limitCount}次/{permission.timeWindow}{permission.timeWindowUnit}
-                    </span>
-                </div>
+                                                <div>
+                                                    <span className="font-medium">权限ID: {permission.id}</span>
+                                                    <span className="ml-4 text-sm text-gray-600">
+                                                        {permission.limitCount}次/{permission.timeWindow}{permission.timeWindowUnit}
+                                                    </span>
+                                                </div>
             )
         }
     } : {};

@@ -126,11 +126,11 @@ export default function UserDetailModal({
             idField: 'id',
             onAdd: async (roleIds: number[]) => {
                 await addUserRole(user.id, roleIds);
-                await fetchUserRoles();
+            await fetchUserRoles();
             },
             onRemove: async (roleId: number) => {
-                await deleteUserRole(user.id, [roleId]);
-                await fetchUserRoles();
+            await deleteUserRole(user.id, [roleId]);
+            await fetchUserRoles();
             },
             customRenderer: (role: any) => (
                 <div>

@@ -145,11 +145,11 @@ export default function GroupDetailModal({
             idField: 'id',
             onAdd: async (userIds: number[]) => {
                 await addUserGroupMember(group.id, userIds);
-                await fetchGroupMembers();
+            await fetchGroupMembers();
             },
             onRemove: async (userId: number) => {
-                await deleteUserGroupMember(group.id, [userId]);
-                await fetchGroupMembers();
+            await deleteUserGroupMember(group.id, [userId]);
+            await fetchGroupMembers();
             },
             customRenderer: (user: any) => (
                 <div>
@@ -172,7 +172,7 @@ export default function GroupDetailModal({
             },
             onRemove: async (roleId: number) => {
                 await deleteUserGroupRole(group.id, [roleId]);
-                await fetchGroupRoles();
+            await fetchGroupRoles();
             },
             customRenderer: (role: any) => (
                 <div>
