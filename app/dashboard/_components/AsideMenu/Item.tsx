@@ -7,7 +7,9 @@ import Link from "next/link";
 import { getButtonColor } from "../../../_lib/colors";
 import AsideMenuList from "./List";
 import { MenuAsideItem } from "../../../_interfaces";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { useAppDispatch } from "../../../_stores/hooks";
+import { logoutUser } from "../../../_lib/userUtils";
 
 type Props = {
   item: MenuAsideItem;
@@ -18,6 +20,8 @@ type Props = {
 const AsideMenuItem = ({ item, isDropdownList = false, ...props }: Props) => {
   const [isLinkActive, setIsLinkActive] = useState(false);
   const [isDropdownActive, setIsDropdownActive] = useState(false);
+  const dispatch = useAppDispatch();
+  const router = useRouter();
 
   const activeClassAddon =
     !item.color && isLinkActive ? "aside-menu-item-active font-bold" : "";
@@ -63,6 +67,14 @@ const AsideMenuItem = ({ item, isDropdownList = false, ...props }: Props) => {
       : `aside-menu-item dark:text-slate-300 dark:hover:text-white`,
   ].join(" ");
 
+  const handleClick = () => {
+    if (item.isLogout) {
+      logoutUser(dispatch, router);
+    } else if (!item.href) {
+      setIsDropdownActive(!isDropdownActive);
+    }
+  };
+
   return (
     <li>
       {item.href && (
@@ -78,7 +90,7 @@ const AsideMenuItem = ({ item, isDropdownList = false, ...props }: Props) => {
       {!item.href && (
         <div
           className={componentClass}
-          onClick={() => setIsDropdownActive(!isDropdownActive)}
+          onClick={handleClick}
         >
           {asideMenuItemInnerContents}
         </div>

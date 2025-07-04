@@ -11,6 +11,8 @@ import NavBarMenuList from "../MenuList";
 import { useAppDispatch, useAppSelector } from "../../../../_stores/hooks";
 import { MenuNavBarItem } from "../../../../_interfaces";
 import { setDarkMode } from "../../../../_stores/darkModeSlice";
+import { useRouter } from "next/navigation";
+import { logoutUser } from "../../../../_lib/userUtils";
 
 type Props = {
   item: MenuNavBarItem;
@@ -19,6 +21,7 @@ type Props = {
 
 export default function NavBarItem({ item, ...props }: Props) {
   const dispatch = useAppDispatch();
+  const router = useRouter();
 
   const userName = useAppSelector((state) => state.main.userName);
 
@@ -42,6 +45,10 @@ export default function NavBarItem({ item, ...props }: Props) {
 
     if (item.isToggleLightDark) {
       dispatch(setDarkMode(null));
+    }
+
+    if (item.isLogout) {
+      logoutUser(dispatch, router);
     }
   };
 

@@ -1,4 +1,5 @@
 import {API_BASE_URL} from "./api"
+import { clearUserData } from "../_lib/userUtils"
 
 const getAuthToken = () => {
     // 在客户端代码中访问 localStorage
@@ -48,8 +49,8 @@ export async function authenticatedFetch(url: string, options: RequestInit = {})
         if (!response.ok) {
             // 检查是否是认证失败的错误码 (例如 401 Unauthorized, 403 Forbidden)
             if (response.status === 401 || response.status === 403) {
-                console.error("Authentication failed or token expired. Clearing token.");
-                removeAuthToken(); // 移除无效 token
+                console.error("Authentication failed or token expired. Clearing user data.");
+                clearUserData(); // 清理所有用户数据
                 // 在实际应用中，这里可能还需要触发一个全局事件或重定向到登录页
                 // 例如：EventBus.emit('auth-expired'); 或 router.push('/login');
                 // 注意：在这里直接调用 router 需要获取 router 实例，或通过抛出特定错误由上层处理

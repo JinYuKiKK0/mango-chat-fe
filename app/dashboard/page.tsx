@@ -10,6 +10,7 @@ import CardBoxWidget from "../_components/CardBox/Widget";
 import CardBox from "../_components/CardBox";
 import { getPageTitle } from "../_lib/config";
 import { Metadata } from "next";
+import AdminOnly from "../_components/AdminOnly";
 
 export const metadata: Metadata = {
   title: getPageTitle("Dashboard"),
@@ -17,7 +18,20 @@ export const metadata: Metadata = {
 
 export default function DashboardPage() {
   return (
-    <SectionMain>
+    <AdminOnly 
+      fallback={
+        <SectionMain>
+          <div className="flex justify-center items-center h-64">
+            <div className="text-center">
+              <div className="text-6xl text-gray-300 mb-4">🔒</div>
+              <h2 className="text-xl font-semibold text-gray-700 mb-2">权限不足</h2>
+              <p className="text-gray-500">您没有权限访问管理后台，请联系管理员</p>
+            </div>
+          </div>
+        </SectionMain>
+      }
+    >
+      <SectionMain>
       <SectionTitleLineWithButton
         icon={mdiAccountGroup}
         title="管理后台总览"
@@ -160,5 +174,6 @@ export default function DashboardPage() {
         </div>
       </CardBox>
     </SectionMain>
+    </AdminOnly>
   );
 }

@@ -12,6 +12,8 @@ import AsideMenu from "../dashboard/_components/AsideMenu";
 import FooterBar from "../dashboard/_components/FooterBar";
 import FormField from "../_components/FormField";
 import { Field, Form, Formik } from "formik";
+import AdminOnly from "../_components/AdminOnly";
+import SectionMain from "../_components/Section/Main";
 
 type Props = {
     children: ReactNode;
@@ -29,6 +31,27 @@ export default function LayoutAuthenticated({ children }: Props) {
     const layoutAsidePadding = "xl:pl-60";
 
     return (
+        <AdminOnly 
+            fallback={
+                <SectionMain>
+                    <div className="flex justify-center items-center h-64">
+                        <div className="text-center">
+                            <div className="text-6xl text-gray-300 mb-4">🔒</div>
+                            <h2 className="text-xl font-semibold text-gray-700 mb-2">权限不足</h2>
+                            <p className="text-gray-500">您没有权限访问管理后台，请联系管理员</p>
+                            <div className="mt-4">
+                                <a 
+                                    href="/basic-chat" 
+                                    className="text-blue-600 hover:text-blue-800 underline"
+                                >
+                                    返回聊天页面
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </SectionMain>
+            }
+        >
         <div className={`overflow-hidden lg:overflow-visible`}>
             <div
                 className={`${layoutAsidePadding} ${
@@ -96,5 +119,6 @@ export default function LayoutAuthenticated({ children }: Props) {
                 </FooterBar>
             </div>
         </div>
+        </AdminOnly>
     );
 }

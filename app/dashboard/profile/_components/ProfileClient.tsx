@@ -9,6 +9,7 @@ import Button from "../../../_components/Button";
 import { getUserSelfInfo, updateUserSelfInfo, UserSelfInfoForm } from "../../../api/api";
 import ProfileEditModal from "./ProfileEditModal";
 import AvatarUpload from "./AvatarUpload";
+import { getCurrentUserId } from "../../../_lib/userUtils";
 
 interface UserInfo {
   id: number;
@@ -26,43 +27,19 @@ export default function ProfileClient() {
   const [showEditModal, setShowEditModal] = useState(false);
   const [showAvatarUpload, setShowAvatarUpload] = useState(false);
 
-  // 获取当前用户ID的函数
-  const getCurrentUserId = (): number => {
-    // 优先从localStorage获取用户信息
-    if (typeof window !== 'undefined') {
-      const userInfo = localStorage.getItem('userInfo');
-      if (userInfo) {
-        try {
-          const user = JSON.parse(userInfo);
-          return user.id || user.userId;
-        } catch (error) {
-          console.error('解析用户信息失败:', error);
-        }
-      }
-      
-      // 如果没有用户信息，可以尝试从token中解析
-      const token = localStorage.getItem('authToken');
-      if (token) {
-        try {
-          // 简单的JWT解析（实际应用中可能需要更复杂的解析逻辑）
-          const payload = JSON.parse(atob(token.split('.')[1]));
-          return payload.userId || payload.id;
-        } catch (error) {
-          console.error('解析token失败:', error);
-        }
-      }
-    }
-    
-    // 如果都获取不到，使用默认值（开发阶段）
-    console.warn('无法获取用户ID，使用默认值');
-    return 3;
-  };
+
 
   // 获取用户信息
   const fetchUserInfo = async () => {
     try {
       setLoading(true);
       const userId = getCurrentUserId();
+      
+      if (!userId) {
+        console.error("无法获取用户ID，请重新登录");
+        return;
+      }
+      
       const response = await getUserSelfInfo(userId);
       
       if (response.code === 200) {

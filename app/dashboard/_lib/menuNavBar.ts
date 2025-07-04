@@ -83,7 +83,7 @@ const menuNavBar: MenuNavBarItem[] = [
   },
   {
     icon: mdiLogout,
-    label: "Log out",
+    label: "退出登录",
     isDesktopNoLabel: true,
     isLogout: true,
   },

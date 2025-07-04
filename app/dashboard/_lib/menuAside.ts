@@ -15,13 +15,13 @@ import { MenuAsideItem } from "../../_interfaces";
 const menuAside: MenuAsideItem[] = [
   {
     href: "/basic-chat",
-    label: "Basic Chat",
+    label: "小芒AI",
     icon: mdiChat,
   },
   {
     href: "/dashboard",
     icon: mdiMonitor,
-    label: "Dashboard",
+    label: "仪表盘",
   },
   {
     label: "后台管理",
@@ -71,7 +71,7 @@ const menuAside: MenuAsideItem[] = [
   },
   {
     href: "/login",
-    label: "Login",
+    label: "登录",
     icon: mdiLock,
   },
 ];

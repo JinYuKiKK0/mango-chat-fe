@@ -7,10 +7,13 @@ import Buttons from "../../_components/Buttons";
 import Divider from "../../_components/Divider";
 import FormField from "../../_components/FormField";
 import FormCheckRadio from "../../_components/FormField/CheckRadio";
-import {LgForm, loginUser} from "../../api/api";
+import {LgForm, loginUser, getUserSelfInfo} from "../../api/api";
 import { useState } from "react";
 import NotificationBar from "../../_components/NotificationBar";
 import {mdiAlert, mdiCheckCircle} from "@mdi/js";
+import { useAppDispatch } from "../../_stores/hooks";
+import { setUser } from "../../_stores/mainSlice";
+import { getCurrentUserId } from "../../_lib/userUtils";
 
 type LoginForm = {
   login: string;
@@ -20,6 +23,7 @@ type LoginForm = {
 
 export default function LoginForm() {
   const router = useRouter();
+  const dispatch = useAppDispatch();
 
   const [showNotification, setShowNotification] = useState(false);
   const [notificationType, setNotificationType] = useState<'success' | 'warning' | null>(null);
@@ -44,8 +48,28 @@ export default function LoginForm() {
       console.log("Login success:", result);
 
       if (result && result.data && result.data.token) {
+        // 保存token
         localStorage.setItem('authToken', result.data.token);
+        // 保存完整的登录响应数据，包含user_id
+        localStorage.setItem('loginData', JSON.stringify(result));
         console.log("Token saved:", result.data.token);
+        console.log("User ID saved:", result.data.user_id);
+
+        // 获取用户详细信息并更新Redux store
+        try {
+          const userId = getCurrentUserId();
+          if (userId) {
+            const userInfoResponse = await getUserSelfInfo(userId);
+            if (userInfoResponse.code === 200) {
+              dispatch(setUser({
+                name: userInfoResponse.data.name,
+                email: userInfoResponse.data.email
+              }));
+            }
+          }
+        } catch (error) {
+          console.error("获取用户信息失败:", error);
+        }
       } else {
         // 处理没有 token 返回的情况，虽然通常登录成功应该有 token
         console.warn("Login successful, but no token received.");
@@ -53,8 +77,19 @@ export default function LoginForm() {
 
       displayNotification('success', '登录成功！');
 
-      setTimeout(() => {
-        router.push("/dashboard");
+      setTimeout(async () => {
+        // 根据用户角色跳转到不同页面
+        try {
+          const loginData = JSON.parse(localStorage.getItem('loginData') || '{}');
+          if (loginData.data?.isAdmin === 'true') {
+            router.push("/dashboard");
+          } else {
+            router.push("/basic-chat");
+          }
+        } catch (error) {
+          console.error("解析登录数据失败:", error);
+          router.push("/basic-chat"); // 默认跳转到聊天页面
+        }
       }, 1000);
 
 
