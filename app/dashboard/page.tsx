@@ -1,24 +1,14 @@
 import {
   mdiAccountMultiple,
-  mdiCartOutline,
-  mdiChartTimelineVariant,
-  // mdiGithub,
-  mdiMonitorCellphone,
+  mdiChatOutline,
+  mdiShield,
+  mdiAccountGroup,
 } from "@mdi/js";
-// import Button from "../_components/Button";
 import SectionMain from "../_components/Section/Main";
 import SectionTitleLineWithButton from "../_components/Section/TitleLineWithButton";
 import CardBoxWidget from "../_components/CardBox/Widget";
-import CardBoxTransaction from "../_components/CardBox/Transaction";
-import { Client, Transaction } from "../_interfaces";
-import CardBoxClient from "../_components/CardBox/Client";
-import SectionBannerStarOnGitHub from "../_components/Section/Banner/StarOnGitHub";
 import CardBox from "../_components/CardBox";
-import NotificationBar from "../_components/NotificationBar";
-import TableSampleClients from "./_components/Table/SampleClients";
 import { getPageTitle } from "../_lib/config";
-import { clients, transactions } from "./_lib/sampleData";
-import ChartLineSampleComponentBlock from "./_components/ChartLineSample/ComponentBlock";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -26,88 +16,148 @@ export const metadata: Metadata = {
 };
 
 export default function DashboardPage() {
-  const clientsListed = clients.slice(0, 4);
-
   return (
     <SectionMain>
       <SectionTitleLineWithButton
-        icon={mdiChartTimelineVariant}
-        title="Overview"
+        icon={mdiAccountGroup}
+        title="管理后台总览"
         main
-      >
-        {/*<Button*/}
-        {/*  href="https://github.com/justboil/admin-one-react-tailwind"*/}
-        {/*  target="_blank"*/}
-        {/*  icon={mdiGithub}*/}
-        {/*  label="Star on GitHub"*/}
-        {/*  color="contrast"*/}
-        {/*  roundedFull*/}
-        {/*  small*/}
-        {/*/>*/}
-      </SectionTitleLineWithButton>
+      />
 
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3 mb-6">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-4 mb-6">
         <CardBoxWidget
-          trendLabel="12%"
+          trendLabel=""
           trendType="up"
           trendColor="success"
           icon={mdiAccountMultiple}
           iconColor="success"
-          number={512}
-          label="Clients"
+          number={0}
+          label="用户总数"
         />
         <CardBoxWidget
-          trendLabel="16%"
-          trendType="down"
-          trendColor="danger"
-          icon={mdiCartOutline}
+          trendLabel=""
+          trendType="up"
+          trendColor="info"
+          icon={mdiChatOutline}
           iconColor="info"
-          number={7770}
-          numberPrefix="$"
-          label="Sales"
+          number={0}
+          label="对话总数"
         />
         <CardBoxWidget
-          trendLabel="Overflow"
-          trendType="warning"
+          trendLabel=""
+          trendType="up"
           trendColor="warning"
-          icon={mdiChartTimelineVariant}
+          icon={mdiShield}
+          iconColor="warning"
+          number={0}
+          label="权限配置"
+        />
+        <CardBoxWidget
+          trendLabel=""
+          trendType="up"
+          trendColor="danger"
+          icon={mdiAccountGroup}
           iconColor="danger"
-          number={256}
-          numberSuffix="%"
-          label="Performance"
+          number={0}
+          label="角色配置"
         />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-        <div className="flex flex-col justify-between">
-          {transactions.map((transaction: Transaction) => (
-            <CardBoxTransaction
-              key={transaction.id}
-              transaction={transaction}
-            />
-          ))}
+      <CardBox>
+        <div className="space-y-4">
+          <h3 className="text-lg font-semibold text-gray-800 mb-4">快速操作</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <a 
+              href="/admin/user" 
+              className="p-4 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors"
+            >
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center">
+                  <span className="text-white text-lg">👥</span>
+                </div>
+                <div>
+                  <h4 className="font-medium text-gray-900">用户管理</h4>
+                  <p className="text-sm text-gray-600">管理系统用户</p>
+                </div>
+              </div>
+            </a>
+            
+            <a 
+              href="/admin/permissions" 
+              className="p-4 bg-green-50 hover:bg-green-100 rounded-lg transition-colors"
+            >
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 bg-green-500 rounded-lg flex items-center justify-center">
+                  <span className="text-white text-lg">🛡️</span>
+                </div>
+                <div>
+                  <h4 className="font-medium text-gray-900">权限管理</h4>
+                  <p className="text-sm text-gray-600">配置用户权限</p>
+                </div>
+              </div>
+            </a>
+            
+            <a 
+              href="/admin/roles" 
+              className="p-4 bg-purple-50 hover:bg-purple-100 rounded-lg transition-colors"
+            >
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 bg-purple-500 rounded-lg flex items-center justify-center">
+                  <span className="text-white text-lg">👤</span>
+                </div>
+                <div>
+                  <h4 className="font-medium text-gray-900">角色管理</h4>
+                  <p className="text-sm text-gray-600">配置用户角色</p>
+                </div>
+              </div>
+            </a>
+            
+            <a 
+              href="/admin/groups" 
+              className="p-4 bg-orange-50 hover:bg-orange-100 rounded-lg transition-colors"
+            >
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 bg-orange-500 rounded-lg flex items-center justify-center">
+                  <span className="text-white text-lg">👥</span>
+                </div>
+                <div>
+                  <h4 className="font-medium text-gray-900">群组管理</h4>
+                  <p className="text-sm text-gray-600">管理用户群组</p>
+                </div>
+              </div>
+            </a>
+            
+            <a 
+              href="/admin/announcements" 
+              className="p-4 bg-red-50 hover:bg-red-100 rounded-lg transition-colors"
+            >
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 bg-red-500 rounded-lg flex items-center justify-center">
+                  <span className="text-white text-lg">📢</span>
+                </div>
+                <div>
+                  <h4 className="font-medium text-gray-900">公告管理</h4>
+                  <p className="text-sm text-gray-600">发布系统公告</p>
+                </div>
+              </div>
+            </a>
+            
+            <a 
+              href="/basic-chat" 
+              className="p-4 bg-indigo-50 hover:bg-indigo-100 rounded-lg transition-colors"
+            >
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 bg-indigo-500 rounded-lg flex items-center justify-center">
+                  <span className="text-white text-lg">💬</span>
+                </div>
+                <div>
+                  <h4 className="font-medium text-gray-900">AI 聊天</h4>
+                  <p className="text-sm text-gray-600">开始AI对话</p>
+                </div>
+              </div>
+            </a>
+          </div>
         </div>
-        <div className="flex flex-col justify-between">
-          {clientsListed.map((client: Client) => (
-            <CardBoxClient key={client.id} client={client} />
-          ))}
-        </div>
-      </div>
-
-      <div className="my-6">
-        <SectionBannerStarOnGitHub />
-      </div>
-
-      <ChartLineSampleComponentBlock />
-
-      <SectionTitleLineWithButton icon={mdiAccountMultiple} title="Clients" />
-
-      <NotificationBar color="info" icon={mdiMonitorCellphone}>
-        <b>Responsive table.</b> Collapses on mobile
-      </NotificationBar>
-
-      <CardBox hasTable>
-        <TableSampleClients clients={clients} />
       </CardBox>
     </SectionMain>
   );

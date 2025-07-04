@@ -108,7 +108,6 @@ export async function sendMessageStreamV2(formData: ChatForm) {
 //3.0用户个人信息管理
 export type UserSelfInfoForm = {
   name: string;
-  email: string;
   password: string;
   avater: string;
 }

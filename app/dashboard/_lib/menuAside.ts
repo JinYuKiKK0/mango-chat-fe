@@ -2,12 +2,8 @@ import {
   mdiAccountCircle,
   mdiMonitor,
   mdiLock,
-  mdiAlertCircle,
-  mdiSquareEditOutline,
   mdiTable,
   mdiViewList,
-  mdiTelevisionGuide,
-  mdiResponsive,
   mdiChat,
   mdiShield,
   mdiAccountGroup,
@@ -68,23 +64,6 @@ const menuAside: MenuAsideItem[] = [
       },
     ],
   },
-
-  {
-    href: "/dashboard/forms",
-    label: "Forms",
-    icon: mdiSquareEditOutline,
-  },
-  {
-    href: "/dashboard/ui",
-    label: "UI",
-    icon: mdiTelevisionGuide,
-  },
-  {
-    href: "/dashboard/responsive",
-    label: "Responsive",
-    icon: mdiResponsive,
-  },
-
   {
     href: "/dashboard/profile",
     label: "Profile",
@@ -95,12 +74,6 @@ const menuAside: MenuAsideItem[] = [
     label: "Login",
     icon: mdiLock,
   },
-  {
-    href: "/error",
-    label: "Error",
-    icon: mdiAlertCircle,
-  },
-
 ];
 
 export default menuAside;
