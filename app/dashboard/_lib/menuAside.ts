@@ -66,7 +66,7 @@ const menuAside: MenuAsideItem[] = [
   },
   {
     href: "/dashboard/profile",
-    label: "Profile",
+    label: "个人资料",
     icon: mdiAccountCircle,
   },
   {

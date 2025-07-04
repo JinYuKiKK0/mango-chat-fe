@@ -109,7 +109,7 @@ export async function sendMessageStreamV2(formData: ChatForm) {
 export type UserSelfInfoForm = {
   name: string;
   password: string;
-  avater: string;
+  avatar: string;
 }
 
 //3.0.1 查询用户个人信息
