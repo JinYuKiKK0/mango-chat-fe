@@ -15,7 +15,8 @@ const AnnouncementForm: React.FC<AnnouncementFormProps> = ({ initialData, onSubm
   const [formData, setFormData] = useState({
     title: '',
     content: '',
-    // Add other relevant fields here, e.g., category, tags, status
+    effectiveTime: '',
+    expirationTime: '',
   });
 
   useEffect(() => {
@@ -23,19 +24,29 @@ const AnnouncementForm: React.FC<AnnouncementFormProps> = ({ initialData, onSubm
       setFormData({
         title: initialData.title || '',
         content: initialData.content || '',
-        // ... map other fields
+        effectiveTime: initialData.effectiveTime || '',
+        expirationTime: initialData.expirationTime || '',
       });
     }
   }, [initialData]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData(prev => ({ 
+      ...prev, 
+      [name]: value || null // Convert empty string to null for datetime fields
+    }));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit(formData);
+    // Convert empty strings to null for datetime fields before submitting
+    const submissionData = {
+      ...formData,
+      effectiveTime: formData.effectiveTime || null,
+      expirationTime: formData.expirationTime || null,
+    };
+    onSubmit(submissionData);
   };
 
   return (
@@ -53,7 +64,7 @@ const AnnouncementForm: React.FC<AnnouncementFormProps> = ({ initialData, onSubm
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label htmlFor="title" className="block text-sm font-semibold text-gray-700">
-              标题
+              标题 <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
@@ -67,7 +78,7 @@ const AnnouncementForm: React.FC<AnnouncementFormProps> = ({ initialData, onSubm
           </div>
           <div>
             <label htmlFor="content" className="block text-sm font-semibold text-gray-700">
-              内容
+              内容 <span className="text-red-500">*</span>
             </label>
             <textarea
               name="content"
@@ -79,7 +90,34 @@ const AnnouncementForm: React.FC<AnnouncementFormProps> = ({ initialData, onSubm
               required
             />
           </div>
-          {/* Add other form fields here as needed */}
+          <div>
+            <label htmlFor="effectiveTime" className="block text-sm font-semibold text-gray-700">
+              有效时间
+            </label>
+            <input
+              type="datetime-local"
+              name="effectiveTime"
+              id="effectiveTime"
+              value={formData.effectiveTime}
+              onChange={handleChange}
+              className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+            />
+            <p className="mt-1 text-xs text-gray-500">公告开始生效的时间（可选）</p>
+          </div>
+          <div>
+            <label htmlFor="expirationTime" className="block text-sm font-semibold text-gray-700">
+              过期时间
+            </label>
+            <input
+              type="datetime-local"
+              name="expirationTime"
+              id="expirationTime"
+              value={formData.expirationTime}
+              onChange={handleChange}
+              className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+            />
+            <p className="mt-1 text-xs text-gray-500">公告过期失效的时间（可选）</p>
+          </div>
           <div className="flex justify-end space-x-2 pt-4">
             <Button
               label="取消"

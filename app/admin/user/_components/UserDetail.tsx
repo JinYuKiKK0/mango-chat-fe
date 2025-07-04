@@ -3,9 +3,15 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { getUserRole, addUserRole, deleteUserRole, getRoleList, getRoleTypes } from '../../../api/api';
-import Button from '../../../_components/Button';
-import { mdiPlus, mdiDelete, mdiCheck } from '@mdi/js';
+import { 
+    getUserRole, 
+    addUserRole, 
+    deleteUserRole, 
+    getRoleList, 
+    getRoleTypes 
+} from '../../../api/api';
+import DetailModal, { FieldConfig, TabConfig, RelationConfig } from '../../../_components/DetailModal';
+import { generateFieldConfigs, COMMON_OPTIONS } from '../../../_components/DetailModal/fieldMappings';
 
 interface UserDetailModalProps {
     user: any;
@@ -14,24 +20,25 @@ interface UserDetailModalProps {
     onUpdate?: (updatedUser: any) => void;
 }
 
-export default function UserDetailModal({ user, onClose, onDelete, onUpdate }: UserDetailModalProps) {
-    const [isEditing, setIsEditing] = useState(false);
-    const [formData, setFormData] = useState(user);
-    const [activeTab, setActiveTab] = useState<'basic' | 'roles'>('basic');
+export default function UserDetailModal({ 
+    user, 
+    onClose, 
+    onDelete, 
+    onUpdate 
+}: UserDetailModalProps) {
+    const [isOpen, setIsOpen] = useState(true);
     
     // 角色管理相关状态
     const [userRoles, setUserRoles] = useState<any[]>([]);
     const [allRoles, setAllRoles] = useState<any[]>([]);
-    const [selectedRoles, setSelectedRoles] = useState<number[]>([]);
-    const [showAddRoles, setShowAddRoles] = useState(false);
     const [roleTypes, setRoleTypes] = useState<{value: number; label: string}[]>([]);
 
     useEffect(() => {
-        setFormData(user);
         if (user?.id) {
             fetchUserRoles();
         }
         fetchRoleTypes();
+        fetchAllRoles();
     }, [user]);
 
     const fetchUserRoles = async () => {
@@ -41,17 +48,17 @@ export default function UserDetailModal({ user, onClose, onDelete, onUpdate }: U
                 const rolesData = response.data;
                 if (Array.isArray(rolesData)) {
                     setUserRoles(rolesData);
-                } else if (rolesData) { // If it's a single object
+                } else if (rolesData) {
                     setUserRoles([rolesData]);
-                } else { // If it's null or undefined
+                } else {
                     setUserRoles([]);
                 }
             } else {
-                setUserRoles([]); // Also handle API error case
+                setUserRoles([]);
             }
         } catch (error) {
             console.error('获取用户角色失败:', error);
-            setUserRoles([]); // Ensure it's an array on error
+            setUserRoles([]);
         }
     };
 
@@ -77,233 +84,99 @@ export default function UserDetailModal({ user, onClose, onDelete, onUpdate }: U
         }
     };
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
-        setFormData((prev: any) => ({
-            ...prev,
-            [name]: value,
-        }));
-    };
-
-    const handleEditToggle = () => {
-        if (isEditing && onUpdate) {
-            onUpdate(formData);
+    // 配置用户字段
+    const userFields: FieldConfig[] = generateFieldConfigs(
+        user,
+        [], // 不排除任何字段
+        {
+            // 自定义字段配置
+            password: { type: 'text', editable: false, placeholder: '密码已隐藏' },
+            email: { required: true, placeholder: '请输入邮箱地址' },
+            username: { required: true, placeholder: '请输入用户名' },
+            nickname: { placeholder: '请输入昵称' },
+            phone: { placeholder: '请输入手机号码' },
+            status: { 
+                type: 'select',
+                options: COMMON_OPTIONS.status
+            },
+            banStatus: {
+                type: 'select',
+                label: '账户状态',
+                options: COMMON_OPTIONS.banStatus,
+                placeholder: '选择账户状态'
+            }
         }
-        setIsEditing(!isEditing);
-    };
-
-    // 角色管理功能
-    const handleAddRoles = async () => {
-        if (selectedRoles.length === 0) return;
-        
-        try {
-            await addUserRole(user.id, selectedRoles);
-            await fetchUserRoles();
-            setSelectedRoles([]);
-            setShowAddRoles(false);
-        } catch (error) {
-            console.error('添加角色失败:', error);
-        }
-    };
-
-    const handleRemoveRole = async (roleId: number) => {
-        try {
-            await deleteUserRole(user.id, [roleId]);
-            await fetchUserRoles();
-        } catch (error) {
-            console.error('删除角色失败:', error);
-        }
-    };
-
-    const toggleRoleSelection = (roleId: number) => {
-        setSelectedRoles(prev => 
-            prev.includes(roleId) 
-                ? prev.filter(id => id !== roleId)
-                : [...prev, roleId]
-        );
-    };
-
-    const availableRoles = allRoles.filter(role => 
-        !userRoles.some(userRole => userRole.id === role.id)
     );
+
+    // 配置标签页
+    const tabs: TabConfig[] = [
+        {
+            key: 'roles',
+            label: '角色管理'
+        }
+    ];
+
+    // 配置角色关联数据
+    const relations: { [key: string]: RelationConfig } = {
+        roles: {
+            title: '用户角色列表',
+            currentItems: userRoles,
+            availableItems: allRoles,
+            displayField: 'name',
+            idField: 'id',
+            onAdd: async (roleIds: number[]) => {
+                await addUserRole(user.id, roleIds);
+                await fetchUserRoles();
+            },
+            onRemove: async (roleId: number) => {
+                await deleteUserRole(user.id, [roleId]);
+                await fetchUserRoles();
+            },
+            customRenderer: (role: any) => (
+                <div>
+                    <span className="font-medium">{role.name}</span>
+                    <span className="ml-4 text-sm text-gray-600">
+                        优先级: {role.rank} | 类型: {formatRoleType(role.roleType)}
+                    </span>
+                </div>
+            )
+        }
+    };
 
     const formatRoleType = (type: number) => {
         const roleType = roleTypes.find(rt => rt.value === type);
         return roleType ? roleType.label : '未知';
     };
 
+    const handleClose = () => {
+        setIsOpen(false);
+        onClose();
+    };
+
+    const handleSave = (updatedData: any) => {
+        if (onUpdate) {
+            onUpdate(updatedData);
+        }
+    };
+
+    const handleDelete = (userId: number) => {
+        setIsOpen(false);
+        onDelete(userId);
+    };
+
     return (
-        <div className="fixed inset-0 backdrop-blur-sm bg-white/30 flex justify-center items-center z-50">
-            <div className="bg-white rounded-xl shadow-lg p-6 w-full max-w-4xl space-y-4 relative max-h-[90vh] overflow-hidden">
-                <button
-                    onClick={onClose}
-                    className="absolute top-2 right-3 text-gray-500 hover:text-gray-700 text-lg z-10"
-                >
-                    ✕
-                </button>
-                
-                <h2 className="text-xl font-bold mb-4">用户详情</h2>
-
-                {/* 标签页导航 */}
-                <div className="flex border-b border-gray-200 mb-4">
-                    <button
-                        className={`px-4 py-2 font-medium ${activeTab === 'basic' 
-                            ? 'text-blue-600 border-b-2 border-blue-600' 
-                            : 'text-gray-500 hover:text-gray-700'
-                        }`}
-                        onClick={() => setActiveTab('basic')}
-                    >
-                        基本信息
-                    </button>
-                    <button
-                        className={`px-4 py-2 font-medium ${activeTab === 'roles' 
-                            ? 'text-blue-600 border-b-2 border-blue-600' 
-                            : 'text-gray-500 hover:text-gray-700'
-                        }`}
-                        onClick={() => {
-                            setActiveTab('roles');
-                            if (allRoles.length === 0) {
-                                fetchAllRoles();
-                            }
-                        }}
-                    >
-                        角色管理
-                    </button>
-                </div>
-
-                <div className="overflow-y-auto max-h-[60vh]">
-                    {/* 基本信息标签页 */}
-                    {activeTab === 'basic' && (
-                        <div className="space-y-4">
-                {Object.keys(formData).map((key) => (
-                    <div key={key}>
-                        <label className="block text-sm font-semibold">{key}</label>
-                        {isEditing ? (
-                            <input
-                                type="text"
-                                name={key}
-                                value={formData[key] ?? ""}
-                                onChange={handleChange}
-                                className="w-full border rounded px-2 py-1 mt-1"
-                            />
-                        ) : (
-                            <p className="border rounded px-2 py-1 mt-1 bg-gray-100">{formData[key]}</p>
-                        )}
-                    </div>
-                ))}
-                        </div>
-                    )}
-
-                    {/* 角色管理标签页 */}
-                    {activeTab === 'roles' && (
-                        <div className="space-y-4">
-                            <div className="flex justify-between items-center">
-                                <h3 className="text-lg font-semibold">用户角色列表</h3>
-                                <Button
-                                    icon={mdiPlus}
-                                    color="info"
-                                    onClick={() => setShowAddRoles(true)}
-                                    label="添加角色"
-                                    small
-                                />
-                            </div>
-
-                            {/* 现有角色列表 */}
-                            <div className="border rounded-lg p-4 max-h-64 overflow-y-auto">
-                                {userRoles.length === 0 ? (
-                                    <p className="text-gray-500 text-center">暂无角色</p>
-                                ) : (
-                                    <div className="space-y-2">
-                                        {userRoles.map((role) => (
-                                            <div key={role.id} className="flex justify-between items-center p-2 bg-gray-50 rounded">
-                                                <div>
-                                                    <span className="font-medium">{role.name}</span>
-                                                    <span className="ml-4 text-sm text-gray-600">
-                                                        优先级: {role.rank} | 类型: {formatRoleType(role.roleType)}
-                                                    </span>
-                                                </div>
-                                                <Button
-                                                    icon={mdiDelete}
-                                                    color="danger"
-                                                    onClick={() => handleRemoveRole(role.id)}
-                                                    small
-                                                />
-                                            </div>
-                                        ))}
-                                    </div>
-                                )}
-                            </div>
-
-                            {/* 添加角色模态框 */}
-                            {showAddRoles && (
-                                <div className="border rounded-lg p-4 bg-gray-50">
-                                    <div className="flex justify-between items-center mb-3">
-                                        <h4 className="font-semibold">选择要添加的角色</h4>
-                                        <button
-                                            onClick={() => setShowAddRoles(false)}
-                                            className="text-gray-500 hover:text-gray-700"
-                                        >
-                                            取消
-                                        </button>
-                                    </div>
-                                    
-                                    <div className="max-h-48 overflow-y-auto space-y-2 mb-3">
-                                        {availableRoles.length === 0 ? (
-                                            <p className="text-gray-500">没有可添加的角色</p>
-                                        ) : (
-                                            availableRoles.map((role) => (
-                                                <div key={role.id} className="flex items-center p-2 bg-white rounded">
-                                                    <input
-                                                        type="checkbox"
-                                                        checked={selectedRoles.includes(role.id)}
-                                                        onChange={() => toggleRoleSelection(role.id)}
-                                                        className="mr-3"
-                                                    />
-                                                    <div>
-                                                        <span className="font-medium">{role.name}</span>
-                                                        <span className="ml-4 text-sm text-gray-600">
-                                                            优先级: {role.rank} | 类型: {formatRoleType(role.roleType)}
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                            ))
-                                        )}
-                                    </div>
-                                    
-                                    {selectedRoles.length > 0 && (
-                                        <Button
-                                            icon={mdiCheck}
-                                            color="success"
-                                            onClick={handleAddRoles}
-                                            label={`添加选中的角色 (${selectedRoles.length})`}
-                                            small
-                                        />
-                                    )}
-                                </div>
-                            )}
-                        </div>
-                    )}
-                </div>
-
-                <div className="flex justify-end space-x-2 pt-4 border-t">
-                    {activeTab === 'basic' && (
-                        <>
-                    <button
-                        onClick={handleEditToggle}
-                        className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded"
-                    >
-                        {isEditing ? '保存' : '编辑'}
-                    </button>
-                    <button
-                        onClick={() => onDelete(user.id)}
-                        className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded"
-                    >
-                        删除
-                    </button>
-                        </>
-                    )}
-                </div>
-            </div>
-        </div>
+        <DetailModal
+            isOpen={isOpen}
+            title="用户"
+            data={user}
+            onClose={handleClose}
+            onSave={handleSave}
+            onDelete={handleDelete}
+            fields={userFields}
+            tabs={tabs}
+            relations={relations}
+            modalSize="xl"
+            showDeleteButton={true}
+        />
     );
 }

@@ -15,7 +15,6 @@ const TipForm: React.FC<TipFormProps> = ({ initialData, onSubmit, onCancel }) =>
   const [formData, setFormData] = useState({
     title: '',
     content: '',
-    category: '',
   });
 
   useEffect(() => {
@@ -23,7 +22,6 @@ const TipForm: React.FC<TipFormProps> = ({ initialData, onSubmit, onCancel }) =>
       setFormData({
         title: initialData.title || '',
         content: initialData.content || '',
-        category: initialData.category || '',
       });
     }
   }, [initialData]);
@@ -53,7 +51,7 @@ const TipForm: React.FC<TipFormProps> = ({ initialData, onSubmit, onCancel }) =>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label htmlFor="title" className="block text-sm font-semibold text-gray-700">
-              标题
+              标题 <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
@@ -67,7 +65,7 @@ const TipForm: React.FC<TipFormProps> = ({ initialData, onSubmit, onCancel }) =>
           </div>
           <div>
             <label htmlFor="content" className="block text-sm font-semibold text-gray-700">
-              内容
+              内容 <span className="text-red-500">*</span>
             </label>
             <textarea
               name="content"
@@ -79,20 +77,6 @@ const TipForm: React.FC<TipFormProps> = ({ initialData, onSubmit, onCancel }) =>
               required
             />
           </div>
-          <div>
-            <label htmlFor="category" className="block text-sm font-semibold text-gray-700">
-              分类
-            </label>
-            <input
-              type="text"
-              name="category"
-              id="category"
-              value={formData.category}
-              onChange={handleChange}
-              className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-            />
-          </div>
-          {/* Add other form fields here as needed */}
           <div className="flex justify-end space-x-2 pt-4">
             <Button
               label="取消"

@@ -52,6 +52,12 @@ const TableGeneric = ({ data, column, onView, onDelete, onUpdate }: Props) => {
         if (columnKey.includes('At') || columnKey.includes('Time') || columnKey.includes('time')) {
             return formatDate(value);
         }
+        
+        // 处理封禁状态
+        if (columnKey === 'banStatus') {
+            return value === 0 ? '正常' : '封禁';
+        }
+        
         return value || '-';
     };
 

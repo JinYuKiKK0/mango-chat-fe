@@ -2,13 +2,15 @@
 
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
+import DetailModal, { FieldConfig } from '../../../_components/DetailModal';
+import { generateFieldConfigs } from '../../../_components/DetailModal/fieldMappings';
 
 interface AnnouncementDetailModalProps {
-    announcement: any; // Changed from 'user' to 'announcement'
+    announcement: any;
     onClose: () => void;
-    onDelete: (announcementId: number) => void; // Changed from 'userId' to 'announcementId'
-    onUpdate?: (updatedAnnouncement: any) => void; // Optional: for updating data
+    onDelete: (announcementId: number) => void;
+    onUpdate?: (updatedAnnouncement: any) => void;
 }
 
 export default function AnnouncementDetailModal({
@@ -17,103 +19,71 @@ export default function AnnouncementDetailModal({
     onDelete,
     onUpdate
 }: AnnouncementDetailModalProps) {
-    const [isEditing, setIsEditing] = useState(false);
-    const [formData, setFormData] = useState(announcement);
+    const [isOpen, setIsOpen] = useState(true);
 
-    useEffect(() => {
-        setFormData(announcement);
-    }, [announcement]);
-
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        const { name, value } = e.target;
-        setFormData((prev: any) => ({
-            ...prev,
-            [name]: value,
-        }));
-    };
-
-    const handleEditToggle = () => {
-        if (isEditing && onUpdate) {
-            onUpdate(formData);
+    // 配置公告字段
+    const announcementFields: FieldConfig[] = generateFieldConfigs(
+        announcement,
+        [], // 不排除任何字段
+        {
+            // 自定义字段配置
+            title: { required: true, placeholder: '请输入公告标题' },
+            content: { type: 'textarea', required: true, placeholder: '请输入公告内容' },
+            publishTime: { type: 'datetime', label: '发布时间' },
+            endTime: { type: 'datetime', label: '结束时间' },
+            isPublished: { 
+                type: 'checkbox', 
+                label: '是否发布',
+                placeholder: '勾选表示立即发布此公告'
+            },
+            status: {
+                type: 'select',
+                options: [
+                    { value: 'draft', label: '草稿' },
+                    { value: 'published', label: '已发布' },
+                    { value: 'expired', label: '已过期' },
+                    { value: 'deleted', label: '已删除' }
+                ]
+            },
+            priority: {
+                type: 'select',
+                options: [
+                    { value: 1, label: '低' },
+                    { value: 2, label: '中' },
+                    { value: 3, label: '高' },
+                    { value: 4, label: '紧急' }
+                ]
+            }
         }
-        setIsEditing(!isEditing);
+    );
+
+    const handleClose = () => {
+        setIsOpen(false);
+        onClose();
     };
 
-    // Define which fields are editable and their types
-    const editableFields: { [key: string]: { type: string, label: string } } = {
-        title: { type: 'text', label: '标题' },
-        content: { type: 'textarea', label: '内容' },
-        // Add other fields like 'category', 'tags' if needed
+    const handleSave = (updatedData: any) => {
+        if (onUpdate) {
+            onUpdate(updatedData);
+        }
+    };
+
+    const handleDelete = (announcementId: number) => {
+        setIsOpen(false);
+        onDelete(announcementId);
     };
 
     return (
-        <div className="fixed inset-0 backdrop-blur-sm bg-black bg-opacity-30 flex justify-center items-center z-50">
-            <div className="bg-white rounded-xl shadow-lg p-6 w-full max-w-lg space-y-4 relative">
-                <button
-                    onClick={onClose}
-                    className="absolute top-3 right-4 text-gray-500 hover:text-gray-700 text-xl"
-                >
-                    ✕
-                </button>
-                <h2 className="text-xl font-bold mb-4">公告详情</h2>
-
-                {Object.keys(formData).map((key) => {
-                    const fieldConfig = editableFields[key];
-                    const isFieldEditable = isEditing && fieldConfig;
-
-                    return (
-                        <div key={key}>
-                            <label className="block text-sm font-semibold capitalize">
-                                {fieldConfig?.label || key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())} {/* Fallback label */}
-                            </label>
-                            {isFieldEditable ? (
-                                fieldConfig.type === 'textarea' ? (
-                                    <textarea
-                                        name={key}
-                                        value={formData[key] ?? ""}
-                                        onChange={handleChange}
-                                        className="w-full border rounded px-2 py-1 mt-1 h-32 resize-none"
-                                        rows={4}
-                                    />
-                                ) : (
-                                    <input
-                                        type={fieldConfig.type}
-                                        name={key}
-                                        value={formData[key] ?? ""}
-                                        onChange={handleChange}
-                                        className="w-full border rounded px-2 py-1 mt-1"
-                                    />
-                                )
-                            ) : (
-                                <p className="border rounded px-2 py-1 mt-1 bg-gray-100 min-h-[34px] break-words whitespace-pre-wrap">
-                                    {formData[key]?.toString() || 'N/A'}
-                                </p>
-                            )}
-                        </div>
-                    );
-                })}
-
-                <div className="flex justify-end space-x-3 pt-4">
-                    <button
-                        onClick={handleEditToggle}
-                        className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded transition duration-150 ease-in-out"
-                    >
-                        {isEditing ? '保存' : '编辑'}
-                    </button>
-                    <button
-                        onClick={() => onDelete(announcement.id)}
-                        className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded transition duration-150 ease-in-out"
-                    >
-                        删除
-                    </button>
-                     <button
-                        onClick={onClose}
-                        className="bg-gray-300 hover:bg-gray-400 text-black px-4 py-2 rounded transition duration-150 ease-in-out"
-                    >
-                        关闭
-                    </button>
-                </div>
-            </div>
-        </div>
+        <DetailModal
+            isOpen={isOpen}
+            title="公告"
+            data={announcement}
+            onClose={handleClose}
+            onSave={handleSave}
+            onDelete={handleDelete}
+            fields={announcementFields}
+            modalSize="lg"
+            showDeleteButton={true}
+        />
     );
 }

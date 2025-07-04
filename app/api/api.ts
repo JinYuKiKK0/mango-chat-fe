@@ -611,6 +611,16 @@ export interface Announcement {
       },
     })
   }
+  //4.2.5 获取角色类型列表
+  export async function getRoleTypes() {
+    const url = `/api/admin/role/types`;
+    return authenticatedFetch(url, {
+        method: "GET",
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    });
+  }
   //4.3 角色权限管理
   //4.3.1 获取角色权限列表
   export async function getRolePermissionList(id: number){
@@ -783,14 +793,4 @@ export interface Announcement {
       },
       body: JSON.stringify(roleIds),
     })
-  }
-
-  export async function getRoleTypes() {
-    const url = `/api/admin/role/types`;
-    return authenticatedFetch(url, {
-        method: "GET",
-        headers: {
-            'Content-Type': 'application/json',
-        },
-    });
   }
