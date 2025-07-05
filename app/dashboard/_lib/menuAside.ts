@@ -15,7 +15,7 @@ import { MenuAsideItem } from "../../_interfaces";
 const menuAside: MenuAsideItem[] = [
   {
     href: "/basic-chat",
-    label: "小芒AI",
+    label: "小芒",
     icon: mdiChat,
   },
   {
@@ -71,7 +71,7 @@ const menuAside: MenuAsideItem[] = [
   },
   {
     href: "/login",
-    label: "登录",
+    label: "重新登录",
     icon: mdiLock,
   },
 ];
