@@ -498,10 +498,9 @@ export interface Announcement {
   
   // 声明时间窗口单位枚举
   export enum TimeWindowUnit {
-    SECOND = 'SECOND',
-    MINUTE = 'MINUTE',
-    HOUR = 'HOUR',
-    DAY = 'DAY',
+    MINUTE = 'minute',
+    HOUR = 'hour',
+    DAY = 'day',
   }
 
   export interface PermissionForm{

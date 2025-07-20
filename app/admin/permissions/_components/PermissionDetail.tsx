@@ -39,7 +39,6 @@ export default function PermissionDetailModal({
     };
 
     const timeWindowUnits = [
-        { value: TimeWindowUnit.SECOND, label: '秒' },
         { value: TimeWindowUnit.MINUTE, label: '分钟' },
         { value: TimeWindowUnit.HOUR, label: '小时' },
         { value: TimeWindowUnit.DAY, label: '天' },
