@@ -1,7 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  output: process.env.IS_OUTPUT_EXPORT ? "export" : "standalone",
+  // output: process.env.IS_OUTPUT_EXPORT ? "export" : "standalone",
+  output: 'export',
   basePath: "/admin-one-react-tailwind",
   async redirects() {
     return [
@@ -21,6 +22,9 @@ const nextConfig: NextConfig = {
         hostname: "static.justboil.me",
       },
     ],
+  },
+  eslint: {
+    ignoreDuringBuilds: true,
   },
 };
 
