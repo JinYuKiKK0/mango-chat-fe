@@ -2,8 +2,6 @@
 
 import React, {useEffect, useState} from "react";
 import { Box, Button, Card, CardContent, TextField, Typography, Divider, List, ListItem, ListItemText, ListItemButton } from "@mui/material";
-import {width} from "@mui/system";
-
 
 
 interface Message {

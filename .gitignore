@@ -3,3 +3,7 @@ node_modules
 .cursor
 openapi.json
 data.json
+
+.idea
+out
+pnpm-lock.yaml
