@@ -33,9 +33,8 @@ export function useLoginMutation() {
             // 登录成功后，可以保存 token 并让相关查询失效
             // 例如，失效用户信息的查询
             if (data.data.token) {
-                localStorage.setItem('jwt_token', data.data.token);
+                localStorage.setItem('authToken', data.data.token);
             }
-            queryClient.invalidateQueries({ queryKey: ['userProfile'] }); // 假设有这样一个查询
         },
     });
 }

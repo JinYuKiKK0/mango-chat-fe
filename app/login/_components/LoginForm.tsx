@@ -132,28 +132,13 @@ export default function LoginForm() {
           )}
         </FormField>
 
-        <FormCheckRadio
-            type="checkbox"
-            label="记住我"
-            labelClassName="text-sm"
-        >
-          <Field type="checkbox" name="remember" />
-        </FormCheckRadio>
-
         <Divider />
 
         <Buttons>
-          <Button type="submit" label="Login" color="info" isGrouped />
-          <Button
-            href="/dashboard"
-            label="Home"
-            color="info"
-            outline
-            isGrouped
-          />
+          <Button type="submit" label="登录" color="info" isGrouped />
           <Button
               href="/login/register"
-              label="Register"
+              label="注册"
               color="info"
               outline
               isGrouped

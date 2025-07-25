@@ -34,7 +34,8 @@ type LoginResponseData = {
 type RegisterRequest = {
     name: string;
     email: string;
-    password?: string;
+    password: string;
+    code: string;
 };
 
 /**
