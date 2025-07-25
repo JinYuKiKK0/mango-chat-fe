@@ -2,6 +2,9 @@
 
 import React, {useEffect, useState} from "react";
 import { Box, Button, Card, CardContent, TextField, Typography, Divider, List, ListItem, ListItemText, ListItemButton } from "@mui/material";
+import {getCurrentUserId} from "../_lib/userUtils";
+import {getConversationList} from "../api/api";
+import {useConversationListQuery} from "../api/queryHooks";
 
 
 interface Message {
@@ -10,26 +13,19 @@ interface Message {
 }
 
 export default function BasicChatPage() {
+    const userId = getCurrentUserId();
+
     const [messages, setMessages] = useState<Message[]>([]);
     const [input, setInput] = useState("");
-    const [historyList, setHistoryList] = useState<string[]>([]);
-
-    useEffect(() => {
-        const fetchHistory = async () => {
-            const data = await new Promise<string[]>((resolve) =>
-                setTimeout(() => resolve(["会话1", "会话2", "会话3"]), 500)
-            );
-            setHistoryList(data);
-        };
-        fetchHistory();
-    }, []);
+    
+    const conversationListQuery = useConversationListQuery(userId?.toString() || "",undefined,1000);
+    const conversationTitleList = conversationListQuery.data?.data.list.map(conv => conv.title) ?? [];
 
     const handleSend = () => {
         if (!input.trim()) return;
         const newMessages = [...messages, { role: "user" as const, content: input }];
         setMessages([...newMessages, { role: "assistant" as const, content: "模拟回复内容" }]);
         setInput("");
-
     };
 
     return (
@@ -41,7 +37,7 @@ export default function BasicChatPage() {
                     </Typography>
                     <Divider />
                     <List>
-                        {historyList.map((item, index) => (
+                        {conversationTitleList.map((item, index) => (
                             <ListItem disablePadding key={index}>
                                 <ListItemButton>
                                     <ListItemText primary={item} />

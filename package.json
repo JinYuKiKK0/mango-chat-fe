@@ -1,7 +1,7 @@
 {
   "private": true,
   "scripts": {
-    "dev": "next dev -p 7106 --turbopack",
+    "dev": "next dev -p 5173 --turbopack",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
@@ -13,6 +13,7 @@
     "@mdi/js": "^7.0.96",
     "@mui/material": "^7.1.0",
     "@reduxjs/toolkit": "^2.5.1",
+    "@tanstack/react-query": "^4.40.1",
     "formik": "^2.4.2",
     "next": "15.1.7",
     "numeral": "^2.0.6",
