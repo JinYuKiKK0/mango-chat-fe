@@ -3,8 +3,6 @@
 import React, {useEffect, useState} from "react";
 import { Box, Button, Card, CardContent, TextField, Typography, Divider, List, ListItem, ListItemText, ListItemButton } from "@mui/material";
 import {getCurrentUserId} from "../_lib/userUtils";
-import {getConversationList} from "../api/api";
-import {useConversationListQuery} from "../api/queryHooks";
 
 
 interface Message {
@@ -17,9 +15,14 @@ export default function BasicChatPage() {
 
     const [messages, setMessages] = useState<Message[]>([]);
     const [input, setInput] = useState("");
-    
-    const conversationListQuery = useConversationListQuery(userId?.toString() || "",undefined,1000);
-    const conversationTitleList = conversationListQuery.data?.data.list.map(conv => conv.title) ?? [];
+
+
+
+    // const conversationListQuery = useConversationListQuery(userId ?? -1 ,undefined,1000);
+    // console.log("conversationListQuery:", conversationListQuery.data)
+    const conversationTitleList =  [];
+        // conversationListQuery.data?.data?.list?.map(conv => conv.title)??
+
 
     const handleSend = () => {
         if (!input.trim()) return;

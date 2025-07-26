@@ -15,48 +15,19 @@ import { MenuNavBarItem } from "../../_interfaces";
 
 const menuNavBar: MenuNavBarItem[] = [
   {
-    icon: mdiMenu,
-    label: "Sample menu",
-    menu: [
-      {
-        icon: mdiClockOutline,
-        label: "Item One",
-      },
-      {
-        icon: mdiCloud,
-        label: "Item Two",
-      },
-      {
-        isDivider: true,
-      },
-      {
-        icon: mdiCrop,
-        label: "Item Last",
-      },
-    ],
-  },
-  {
     isCurrentUser: true,
     menu: [
       {
         icon: mdiAccount,
-        label: "My Profile",
+        label: "个人资料",
         href: "/dashboard/profile",
-      },
-      {
-        icon: mdiCogOutline,
-        label: "Settings",
-      },
-      {
-        icon: mdiEmail,
-        label: "Messages",
       },
       {
         isDivider: true,
       },
       {
         icon: mdiLogout,
-        label: "Log Out",
+        label: "退出登录",
         isLogout: true,
       },
     ],
@@ -66,26 +37,6 @@ const menuNavBar: MenuNavBarItem[] = [
     label: "Light/Dark",
     isDesktopNoLabel: true,
     isToggleLightDark: true,
-  },
-  {
-    icon: mdiGithub,
-    label: "GitHub",
-    isDesktopNoLabel: true,
-    href: "https://github.com/justboil/admin-one-react-tailwind",
-    target: "_blank",
-  },
-  {
-    icon: mdiVuejs,
-    label: "Vue version",
-    isDesktopNoLabel: true,
-    href: "https://github.com/justboil/admin-one-vue-tailwind",
-    target: "_blank",
-  },
-  {
-    icon: mdiLogout,
-    label: "退出登录",
-    isDesktopNoLabel: true,
-    isLogout: true,
   },
 ];
 

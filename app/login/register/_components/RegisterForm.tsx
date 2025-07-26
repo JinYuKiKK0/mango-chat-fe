@@ -10,7 +10,6 @@ import Buttons from "../../../_components/Buttons";
 import Divider from "../../../_components/Divider";
 import FormField from "../../../_components/FormField";
 import NotificationBar from '../../../_components/NotificationBar';
-import { useRegisterMutation } from "../../../api/queryHooks";
 import {register, RegisterForm} from "../../../api/api";
 
 export default function RegForm() {

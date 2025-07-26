@@ -14,7 +14,8 @@ import {
     getConversationDetails,
     getPublicAnnouncementList,
     getPublicAnnouncementDetails
-} from './api'; // 假设API客户端文件在同级目录
+} from './api';
+import {aiApi} from "./apis"; // 假设API客户端文件在同级目录
 
 // =================================================================
 // React Query Hooks
@@ -89,10 +90,10 @@ export function useRateLimitReminderQuery(userId: string) {
  * @param {number} [lastSessionId] - 分页游标
  * @param {number} [pageSize=10] - 每页大小
  */
-export function useConversationListQuery(userId: string, lastSessionId?: number, pageSize: number = 10) {
+export function useConversationListQuery(userId: number, lastSessionId?: number, pageSize: number = 10) {
     return useQuery({
         queryKey: ['conversationList', userId, lastSessionId, pageSize],
-        queryFn: () => getConversationList(userId, lastSessionId, pageSize),
+        queryFn: () => aiApi.getConversationList({ userId, lastSessionId, pageSize}) ,
         enabled: !!userId,
         staleTime: 1000 * 60, // 1分钟内数据被认为是新鲜的
     });
