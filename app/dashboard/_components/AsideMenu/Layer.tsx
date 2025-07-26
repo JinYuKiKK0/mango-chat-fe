@@ -21,7 +21,7 @@ export default function AsideMenuLayer({
   const darkMode = useAppSelector((state) => state.darkMode.isEnabled);
 
   const logoutItem: MenuAsideItem = {
-    label: "Logout",
+    label: "退出登录",
     icon: mdiLogout,
     color: "info",
     isLogout: true,

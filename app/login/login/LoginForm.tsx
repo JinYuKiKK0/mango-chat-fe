@@ -8,7 +8,7 @@ import Divider from "../../_components/Divider";
 import FormField from "../../_components/FormField";
 import FormCheckRadio from "../../_components/FormField/CheckRadio";
 import {LgForm, loginUser, getUserSelfInfo} from "../../api/api";
-import { useState } from "react";
+import {useEffect, useState} from "react";
 import NotificationBar from "../../_components/NotificationBar";
 import {mdiAlert, mdiCheckCircle} from "@mdi/js";
 import { useAppDispatch } from "../../_stores/hooks";
@@ -23,6 +23,15 @@ type LoginForm = {
 
 export default function LoginForm() {
   const router = useRouter();
+
+  // 如果已经登录，则跳转到dashboard页面
+  useEffect(() => {
+    if (getCurrentUserId()) {
+      router.push("/dashboard");
+    }
+  }, [router]);
+
+
   const dispatch = useAppDispatch();
 
   const [showNotification, setShowNotification] = useState(false);
