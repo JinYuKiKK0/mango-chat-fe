@@ -169,6 +169,13 @@ export default function LoginForm() {
               outline
               isGrouped
           />
+          <Button
+              href="/login/changePassword"
+              label="忘记密码?点击修改"
+              color="info"
+              outline
+              isGrouped
+          />
         </Buttons>
 
       </Form>

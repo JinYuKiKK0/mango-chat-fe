@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from 'react';
-import { Formik, Form, Field, ErrorMessage, FormikErrors } from "formik";
+import { useState, useEffect } from 'react';
+import { Formik, Form, Field, ErrorMessage, FormikErrors, useFormikContext } from "formik";
 import { useRouter } from "next/navigation";
 import { mdiCheckCircle, mdiAlert } from '@mdi/js';
 
@@ -10,7 +10,8 @@ import Buttons from "../../_components/Buttons";
 import Divider from "../../_components/Divider";
 import FormField from "../../_components/FormField";
 import NotificationBar from '../../_components/NotificationBar';
-import {register, RegisterForm} from "../../api/api";
+import { defaultApi } from "../../api";
+import {SendCodeButton} from "../_components/SendCodeButton";
 
 // 校验函数
 const registerFormValidate = (values: RegisterRequest): FormikErrors<RegisterRequest> => {
@@ -56,25 +57,24 @@ export default function RegForm() {
     setShowNotification(true);
     setTimeout(() => {
       setShowNotification(false);
-    }, 3000); // 延长显示时间以便用户查看
+    }, 3000);
   };
 
   // 处理注册的提交事件
-  const handleSubmit = (values: RegisterRequest) => {
-    register(values).then(
-        (result) => {
-          if (result.code === 200){
-            displayNotification('success', '注册成功！即将跳转到登录页面...');
-              setTimeout(() => {
-                router.push("/login");
-              }, 1500);
-          }
-        }
-    );
-  };
-
-  const handleSendVerificationCode = () => {
-
+  const handleSubmit = async (values: RegisterRequest) => {
+    try {
+      const result = await defaultApi.register({registerRequest: values});
+      if (result.code === 200){
+        displayNotification('success', '注册成功！即将跳转到登录页面...');
+        setTimeout(() => {
+          router.push("/login");
+        }, 1500);
+      } else {
+        displayNotification('warning', result.message || '注册失败，请重试');
+      }
+    } catch (error) {
+      displayNotification('warning', '注册请求失败');
+    }
   };
 
   const initialValues: RegisterRequest = {
@@ -93,7 +93,7 @@ export default function RegForm() {
           validate={registerFormValidate}
           onSubmit={handleSubmit}
       >
-        {({ isSubmitting }) => (
+        {({ isSubmitting, values }) => (
             <Form>
               {showNotification && notificationType && (
                   <NotificationBar color={notificationColor} icon={notificationIcon}>
@@ -101,32 +101,45 @@ export default function RegForm() {
                   </NotificationBar>
               )}
 
-              <FormField label="昵称" help="">
+              <FormField label="昵称">
                 {({ className }) => <Field name="name" className={className} />}
               </FormField>
               <div className="h-5">
-                 <ErrorMessage name="name" component="div" className="text-red-500 text-sm" />
+                <ErrorMessage name="name" component="div" className="text-red-500 text-sm" />
               </div>
 
-              <FormField label="邮箱" help="">
-                {({ className }) => <Field name="email" type="email" className={className} />}
+              <FormField label="邮箱">
+                {(fieldData) => (
+                    <div className="flex items-center gap-2">
+                      <Field
+                          name="email"
+                          type="email"
+                          placeholder="请输入邮箱"
+                          className={`${fieldData.className}`}
+                      />
+                      <SendCodeButton
+                          displayNotification={displayNotification}
+                          onSend={() => {return defaultApi.sendRegisterCode({ sendCodeRequest: { email: values.email } })}}
+                      />
+                    </div>
+                )}
               </FormField>
               <div className="h-5">
                 <ErrorMessage name="email" component="div" className="text-red-500 text-sm" />
               </div>
 
-              <FormField label="密码" help="">
+              <FormField label="验证码">
+                {({ className }) => <Field name="code" className={className} />}
+              </FormField>
+              <div className="h-5">
+                <ErrorMessage name="code" component="div" className="text-red-500 text-sm " />
+              </div>
+
+              <FormField label="密码">
                 {({ className }) => <Field name="password" type="password" className={className} />}
               </FormField>
               <div className="h-5">
                 <ErrorMessage name="password" component="div" className="text-red-500 text-sm" />
-              </div>
-
-              <FormField label="验证码" help="">
-                {({ className }) => <Field name="code" className={className} />}
-              </FormField>
-              <div className="h-5">
-                 <ErrorMessage name="code" component="div" className="text-red-500 text-sm " />
               </div>
 
               <Divider />
@@ -134,7 +147,7 @@ export default function RegForm() {
               <Buttons>
                 <Button type="submit" label="注册" color="info" isGrouped disabled={isSubmitting} />
                 <Button
-                    href="/login" // 链接到登录页
+                    href="/login"
                     label="已有账户? 去登录"
                     color="info"
                     outline
