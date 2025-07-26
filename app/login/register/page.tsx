@@ -3,7 +3,7 @@ import CardBox from "../../_components/CardBox";
 import SectionFullScreen from "../../_components/Section/FullScreen";
 import { getPageTitle } from "../../_lib/config";
 import { Metadata } from "next";
-import RegForm from "./_components/RegisterForm";
+import RegForm from "./RegisterForm";
 
 export const metadata: Metadata = {
   title: getPageTitle("Login"),

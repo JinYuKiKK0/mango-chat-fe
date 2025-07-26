@@ -2,8 +2,9 @@ import type { Metadata } from "next";
 import "../css/main.css";
 import StoreProvider from "./_stores/StoreProvider";
 import Script from "next/script";
+import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
 
-const title = `One React`;
+const title = `小芒`;
 
 const description =
   "";

@@ -1,10 +1,8 @@
 // api/api.ts
 
-export const API_BASE_URL = "http://localhost:8080";
+export const API_BASE_URL = "http://8.153.175.3";
 
-import {authenticatedFetch} from "./util"
-
-
+import {authenticatedFetch} from "./util";
 
 // 用户注册
 export type RegisterForm = {
@@ -56,50 +54,138 @@ export async function loginUser(formData: LgForm) {
     return data;
 }
 
-//2. ai-chat模块
-//2.1 创建对话（创建对话也是访问基础对话接口，只是首次访问会留空'conversation_id'字段。）
-//2.1 基础对话
-export interface ChatForm {
-    key: string;
-}
 
-// 2.1.1 发送消息
-export async function sendMessage(formData: ChatForm) {
-    return authenticatedFetch("/api/chat", {
-        method: "POST",
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
+// =================================================================
+// 1. 登录/鉴权 模块
+// =================================================================
+
+/**
+ * 1.1 登录
+ * @param {LoginRequest} credentials - 用户的邮箱和密码。
+ * @returns {Promise<BaseResponse<LoginResponseData>>} 包含 JWT token 的 API 响应。
+ */
+export async function login(credentials: LoginRequest): Promise<BaseResponse<LoginResponseData>> {
+    return authenticatedFetch('/auth/login', {
+        method: 'POST',
+        body: JSON.stringify(credentials),
     });
 }
 
-// 2.1.2 流式对话接口
-export async function sendMessageStream(formData: ChatForm) {
-    return authenticatedFetch("/api/chat/stream", {
-        method: "POST",
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
+/**
+ * 1.2 注册
+ * @param {RegisterRequest} userInfo - 新用户的用户名、邮箱和密码。
+ * @returns {Promise<BaseResponse<string>>} 确认注册成功的 API 响应。
+ */
+export async function register(userInfo: RegisterRequest): Promise<BaseResponse<string>> {
+    return authenticatedFetch('/auth/register', {
+        method: 'POST',
+        body: JSON.stringify(userInfo),
     });
 }
 
-// 2.1.3 流式对话接口v2
-export async function sendMessageStreamV2(formData: ChatForm) {
-    return authenticatedFetch("/api/chat/stream/v2", {
-        method: "POST",
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
+/**
+ * 1.3 重置密码
+ * @param {ResetPasswordRequest} data - 用户的邮箱、新密码和验证码。
+ * @returns {Promise<BaseResponse<any>>} 确认密码重置的 API 响应。
+ */
+export async function resetPassword(data: ResetPasswordRequest): Promise<BaseResponse<any>> {
+    return authenticatedFetch('/api/auth/reset', {
+        method: 'POST',
+        body: JSON.stringify(data),
     });
 }
 
-//2.2 对话记录管理
-//2.2.1 获取对话记录列表（标题）
 
-//2.2.2 按id查询详细信息
+// =================================================================
+// 2. ai-chat 模块
+// =================================================================
+
+/**
+ * 2.1 基础对话 (SSE)
+ * 此函数初始化一个服务器发送事件 (SSE) 连接。
+ * 它返回原始的 Response 对象，以便调用者可以处理流。
+ * @param {StreamChatRequest} data - 聊天消息和可选的会话 ID。
+ * @returns {Promise<Response>} 原始的 fetch Response 对象，用于读取流。
+ */
+export async function startStreamChat(data: StreamChatRequest): Promise<Response> {
+    // 注意：我们返回原始响应，以便在调用组件中处理流。
+    return authenticatedFetch('/api/chat/stream/v2', {
+        method: 'POST',
+        headers: {
+            'Accept': 'text/event-stream', // 对 SSE 很重要
+        },
+        body: JSON.stringify(data),
+    });
+}
+
+/**
+ * 2.2.2 获取限流提醒信息
+ * @param {string} userId - 用户的 ID。
+ * @returns {Promise<RateLimitReminderResponse>} 用户的剩余消息数和刷新时间。
+ */
+export async function getRateLimitReminder(userId: string): Promise<RateLimitReminderResponse> {
+    const url = `/api/chat/remain_msg?user_id=${encodeURIComponent(userId)}`;
+    return authenticatedFetch(url, {
+        method: 'GET',
+    });
+}
+
+/**
+ * 2.3.1 获取对话记录列表（标题）
+ * @param {string} userId - 用户的 ID。
+ * @param {number} [lastSessionId] - 用于分页的游标。首页请求时省略。
+ * @param {number} [pageSize=10] - 每页的项目数。
+ * @returns {Promise<ConversationListResponse>} 分页的会话标题列表。
+ */
+export async function getConversationList(userId: string, lastSessionId?: number, pageSize: number = 10): Promise<ConversationListResponse> {
+    let url = `/api/chat/list?user_id=${encodeURIComponent(userId)}&page_size=${pageSize}`;
+    if (lastSessionId) {
+        url += `&lastSessionId=${lastSessionId}`;
+    }
+    return authenticatedFetch(url, {
+        method: 'GET',
+    });
+}
+
+/**
+ * 2.3.2 根据ID查询会话详细信息
+ * @param {string} userId - 用户的 ID。
+ * @param {number} sessionId - 会话的 ID。
+ * @returns {Promise<BaseResponse<ConversationDetailData>>} 会话的详细信息和上下文。
+ */
+export async function getConversationDetails(userId: string, sessionId: number): Promise<BaseResponse<ConversationDetailData>> {
+    const url = `/api/chat/info?user_id=${encodeURIComponent(userId)}&session_id=${sessionId}`;
+    return authenticatedFetch(url, {
+        method: 'GET',
+    });
+}
+
+
+// =================================================================
+// 2.4 公告查询模块
+// =================================================================
+
+/**
+ * 2.4.1 查询有效公告列表
+ * @returns {Promise<BaseResponse<AnnouncementListItem[]>>} 一个包含有效公告的列表。
+ */
+export async function getPublicAnnouncementList(): Promise<BaseResponse<AnnouncementListItem[]>> {
+    return authenticatedFetch('/api/announcement/list', {
+        method: 'GET',
+    });
+}
+
+/**
+ * 2.4.2 根据ID查询公告详细信息
+ * @param {number} announcementId - 公告的 ID。
+ * @returns {Promise<BaseResponse<AnnouncementDetailData>>} 公告的完整详情。
+ */
+export async function getPublicAnnouncementDetails(announcementId: number): Promise<BaseResponse<AnnouncementDetailData>> {
+    const url = `/api/announcement?a_id=${announcementId}`;
+    return authenticatedFetch(url, {
+        method: 'GET',
+    });
+}
 
 
 

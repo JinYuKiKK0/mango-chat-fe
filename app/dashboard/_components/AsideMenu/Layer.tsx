@@ -21,7 +21,7 @@ export default function AsideMenuLayer({
   const darkMode = useAppSelector((state) => state.darkMode.isEnabled);
 
   const logoutItem: MenuAsideItem = {
-    label: "Logout",
+    label: "退出登录",
     icon: mdiLogout,
     color: "info",
     isLogout: true,
@@ -42,9 +42,6 @@ export default function AsideMenuLayer({
         <div
           className={`aside-brand flex flex-row h-14 items-center justify-between dark:bg-slate-900`}
         >
-          <div className="text-center flex-1 lg:text-left lg:pl-6 xl:text-center xl:pl-0">
-            <b className="font-black">One</b>
-          </div>
           <button
             className="hidden lg:inline-block xl:hidden p-3"
             onClick={handleAsideLgCloseClick}

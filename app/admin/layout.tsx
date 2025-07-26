@@ -77,26 +77,6 @@ export default function LayoutAuthenticated({ children }: Props) {
                     >
                         <Icon path={mdiMenu} size="24" />
                     </NavBarItemPlain>
-                    <NavBarItemPlain useMargin>
-                        <Formik
-                            initialValues={{
-                                search: "",
-                            }}
-                            onSubmit={(values) => alert(JSON.stringify(values, null, 2))}
-                        >
-                            <Form>
-                                <FormField isBorderless isTransparent>
-                                    {({ className }) => (
-                                        <Field
-                                            name="search"
-                                            placeholder="Search"
-                                            className={className}
-                                        />
-                                    )}
-                                </FormField>
-                            </Form>
-                        </Formik>
-                    </NavBarItemPlain>
                 </NavBar>
                 <AsideMenu
                     isAsideMobileExpanded={isAsideMobileExpanded}

@@ -3,7 +3,7 @@ import CardBox from "./_components/CardBox";
 import SectionFullScreen from "./_components/Section/FullScreen";
 import { getPageTitle } from "./_lib/config";
 import { Metadata } from "next";
-import LoginForm from "./login/_components/LoginForm";
+import LoginForm from "./login/LoginForm";
 
 export const metadata: Metadata = {
   title: getPageTitle("Login"),
