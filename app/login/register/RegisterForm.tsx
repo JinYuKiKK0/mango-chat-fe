@@ -12,6 +12,35 @@ import FormField from "../../_components/FormField";
 import NotificationBar from '../../_components/NotificationBar';
 import {register, RegisterForm} from "../../api/api";
 
+// 校验函数
+export const registerFormValidate = (values: RegisterRequest): FormikErrors<RegisterRequest> => {
+  const errors: FormikErrors<RegisterRequest> = {};
+
+  if (!values.name) {
+    errors.name = '昵称不能为空';
+  }
+
+  if (!values.email) {
+    errors.email = '邮箱不能为空';
+  } else if (
+      !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(values.email)
+  ) {
+    errors.email = '邮箱格式不正确';
+  }
+
+  if (!values.password) {
+    errors.password = '密码不能为空';
+  } else if (values.password.length < 6) {
+    errors.password = '密码长度不能少于6位';
+  }
+
+  if (!values.code) {
+    errors.code = '验证码不能为空';
+  }
+
+  return errors;
+};
+
 export default function RegForm() {
   const router = useRouter();
 
@@ -55,42 +84,13 @@ export default function RegForm() {
     code: "",
   };
 
-  // 校验函数
-  const validate = (values: RegisterRequest): FormikErrors<RegisterRequest> => {
-    const errors: FormikErrors<RegisterRequest> = {};
-
-    if (!values.name) {
-      errors.name = '昵称不能为空';
-    }
-
-    if (!values.email) {
-      errors.email = '邮箱不能为空';
-    } else if (
-        !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(values.email)
-    ) {
-      errors.email = '邮箱格式不正确';
-    }
-
-    if (!values.password) {
-      errors.password = '密码不能为空';
-    } else if (values.password.length < 6) {
-      errors.password = '密码长度不能少于6位';
-    }
-
-    if (!values.code) {
-      errors.code = '验证码不能为空';
-    }
-
-    return errors;
-  };
-
   const notificationColor = notificationType === 'success' ? 'success' : 'warning';
   const notificationIcon = notificationType === 'success' ? mdiCheckCircle : mdiAlert;
 
   return (
       <Formik
           initialValues={initialValues}
-          validate={validate}
+          validate={registerFormValidate}
           onSubmit={handleSubmit}
       >
         {({ isSubmitting }) => (
@@ -104,22 +104,30 @@ export default function RegForm() {
               <FormField label="昵称" help="">
                 {({ className }) => <Field name="name" className={className} />}
               </FormField>
-              <ErrorMessage name="name" component="div" className="text-red-500 text-sm" />
+              <div className="h-5">
+                 <ErrorMessage name="name" component="div" className="text-red-500 text-sm" />
+              </div>
 
               <FormField label="邮箱" help="">
                 {({ className }) => <Field name="email" type="email" className={className} />}
               </FormField>
-              <ErrorMessage name="email" component="div" className="text-red-500 text-sm" />
+              <div className="h-5">
+                <ErrorMessage name="email" component="div" className="text-red-500 text-sm" />
+              </div>
 
               <FormField label="密码" help="">
                 {({ className }) => <Field name="password" type="password" className={className} />}
               </FormField>
-              <ErrorMessage name="password" component="div" className="text-red-500 text-sm" />
+              <div className="h-5">
+                <ErrorMessage name="password" component="div" className="text-red-500 text-sm" />
+              </div>
 
               <FormField label="验证码" help="">
                 {({ className }) => <Field name="code" className={className} />}
               </FormField>
-              <ErrorMessage name="code" component="div" className="text-red-500 text-sm " />
+              <div className="h-5">
+                 <ErrorMessage name="code" component="div" className="text-red-500 text-sm " />
+              </div>
 
               <Divider />
 

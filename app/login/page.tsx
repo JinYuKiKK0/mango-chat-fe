@@ -1,7 +1,7 @@
 import React from "react";
-import CardBox from "../../_components/CardBox";
-import SectionFullScreen from "../../_components/Section/FullScreen";
-import { getPageTitle } from "../../_lib/config";
+import CardBox from "../_components/CardBox";
+import SectionFullScreen from "../_components/Section/FullScreen";
+import { getPageTitle } from "../_lib/config";
 import { Metadata } from "next";
 import LoginForm from "./LoginForm";
 
