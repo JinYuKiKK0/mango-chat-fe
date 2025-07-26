@@ -104,7 +104,7 @@ export default function RegForm() {
               <FormField label="昵称">
                 {({ className }) => <Field name="name" className={className} />}
               </FormField>
-              <div className="h-5">
+              <div className="h-5 mt-1">
                 <ErrorMessage name="name" component="div" className="text-red-500 text-sm" />
               </div>
 
@@ -124,21 +124,21 @@ export default function RegForm() {
                     </div>
                 )}
               </FormField>
-              <div className="h-5">
+              <div className="h-5 mt-1">
                 <ErrorMessage name="email" component="div" className="text-red-500 text-sm" />
               </div>
 
               <FormField label="验证码">
                 {({ className }) => <Field name="code" className={className} />}
               </FormField>
-              <div className="h-5">
+              <div className="h-5 mt-1">
                 <ErrorMessage name="code" component="div" className="text-red-500 text-sm " />
               </div>
 
               <FormField label="密码">
                 {({ className }) => <Field name="password" type="password" className={className} />}
               </FormField>
-              <div className="h-5">
+              <div className="h-5 mt-1">
                 <ErrorMessage name="password" component="div" className="text-red-500 text-sm" />
               </div>
 

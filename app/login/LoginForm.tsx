@@ -147,14 +147,14 @@ export default function LoginForm() {
         <FormField label="邮箱" help="">
           {({ className }) => <Field name="email" className={className} />}
         </FormField>
-        <div className="h-5">
+        <div className="h-5 mt-1">
           <ErrorMessage name="email" component="div" className="text-red-500 text-sm" />
         </div>
 
         <FormField label="密码" help="">
           {({ className }) => (<Field name="password" type="password" className={className} />)}
         </FormField>
-        <div className="h-5">
+        <div className="h-5 mt-1">
           <ErrorMessage name="password" component="div" className="text-red-500 text-sm" />
         </div>
 

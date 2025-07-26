@@ -125,22 +125,22 @@ export default function ChangePasswordForm() {
                     </div>
                 )}
               </FormField>
-              <div className="h-5"><ErrorMessage name="email" component="div" className="text-red-500 text-sm" /></div>
+              <div className="h-5 mt-1"><ErrorMessage name="email" component="div" className="text-red-500 text-sm" /></div>
 
               <FormField label="验证码">
                 {({ className }) => <Field name="code" className={className} />}
               </FormField>
-              <div className="h-5"><ErrorMessage name="code" component="div" className="text-red-500 text-sm" /></div>
+              <div className="h-5 mt-1"><ErrorMessage name="code" component="div" className="text-red-500 text-sm" /></div>
 
               <FormField label="新密码">
                 {({ className }) => <Field name="newPassword" type="password" className={className} />}
               </FormField>
-              <div className="h-5"><ErrorMessage name="newPassword" component="div" className="text-red-500 text-sm" /></div>
+              <div className="h-5 mt-1"><ErrorMessage name="newPassword" component="div" className="text-red-500 text-sm" /></div>
 
               <FormField label="确认新密码">
                 {({ className }) => <Field name="confirmPassword" type="password" className={className} />}
               </FormField>
-              <div className="h-5"><ErrorMessage name="confirmPassword" component="div" className="text-red-500 text-sm" /></div>
+              <div className="h-5 mt-1"><ErrorMessage name="confirmPassword" component="div" className="text-red-500 text-sm" /></div>
 
               <Divider />
 
