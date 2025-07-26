@@ -15,12 +15,26 @@ import { useAppDispatch } from "../_stores/hooks";
 import { setUser } from "../_stores/mainSlice";
 import { getCurrentUserId } from "../_lib/userUtils";
 import {defaultApi} from "../api";
-import {registerFormValidate} from "./register/RegisterForm";
 
-type LoginForm = {
-  login: string;
-  password: string;
-  remember: boolean;
+// 校验函数
+const loginFormValidate = (values: RegisterRequest): FormikErrors<RegisterRequest> => {
+  const errors: FormikErrors<RegisterRequest> = {};
+
+  if (!values.email) {
+    errors.email = '邮箱不能为空';
+  } else if (
+      !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(values.email)
+  ) {
+    errors.email = '邮箱格式不正确';
+  }
+
+  if (!values.password) {
+    errors.password = '密码不能为空';
+  } else if (values.password.length < 6) {
+    errors.password = '密码长度不能少于6位';
+  }
+
+  return errors;
 };
 
 export default function LoginForm() {
@@ -118,7 +132,7 @@ export default function LoginForm() {
 
 
   return (
-    <Formik initialValues={initialValues} onSubmit={handleSubmit} validate={registerFormValidate}>
+    <Formik initialValues={initialValues} onSubmit={handleSubmit} validate={loginFormValidate}>
       <Form>
         {showNotification && notificationType && (
             <NotificationBar

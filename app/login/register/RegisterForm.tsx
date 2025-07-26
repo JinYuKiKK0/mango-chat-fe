@@ -13,7 +13,7 @@ import NotificationBar from '../../_components/NotificationBar';
 import {register, RegisterForm} from "../../api/api";
 
 // 校验函数
-export const registerFormValidate = (values: RegisterRequest): FormikErrors<RegisterRequest> => {
+const registerFormValidate = (values: RegisterRequest): FormikErrors<RegisterRequest> => {
   const errors: FormikErrors<RegisterRequest> = {};
 
   if (!values.name) {
