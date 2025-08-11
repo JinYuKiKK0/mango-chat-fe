@@ -24,14 +24,17 @@ export default function TipsClient() {
     const [showFormModal, setShowFormModal] = useState(false); // State for TipForm modal
     const [editingTip, setEditingTip] = useState<any>(null); // State for tip being edited
 
-    const fetchData = async () => {
-        try {
-            const response = await getTipList(); // 调用 API 获取 Tips 列表
-            console.log("Tips列表返回:", response);
+    const [page, setPage] = useState(0);
+    const [pageSize] = useState(10);
+    const [totalPages, setTotalPages] = useState(1);
+    const [totalElements, setTotalElements] = useState(0);
+    const [loading, setLoading] = useState(false);
 
-            // 后端返回格式: { code: 200, message: "查询成功", data: { content: [...], page, pageSize, totalElements, totalPages }, column: [...] }
-            if (response && response.code === 200 && response.data && Array.isArray(response.data.content)) {
-                // 处理列配置：将后端返回的 column 数组转换为前端期望的格式
+    const fetchData = async (nextPage: number) => {
+        setLoading(true);
+        try {
+            const response = await getTipList(nextPage, pageSize); // 调用 API 获取 Tips 列表
+            if (response && response.code === 200 && response.data) {
                 const columns = response.column ? response.column.map((col: any) => ({
                     key: col.column,
                     title: col.value
@@ -41,14 +44,15 @@ export default function TipsClient() {
                     { key: 'createdAt', title: '创建时间' },
                     { key: 'updatedAt', title: '更新时间' },
                 ];
-
                 setTableData({
-                    data: response.data.content,
+                    data: response.data.content || [],
                     column: columns
                 });
+                setPage(response.data.page ?? nextPage);
+                setTotalPages(response.data.totalPages ?? 1);
+                setTotalElements(response.data.totalElements ?? 0);
             } else {
                 console.error("API 返回格式不正确或无数据:", response);
-                // 即使出错，也设置一个带列定义的空数据结构
                 setTableData({ 
                     data: [], 
                     column: [
@@ -58,10 +62,11 @@ export default function TipsClient() {
                         { key: 'updatedAt', title: '更新时间' },
                     ] 
                 });
+                setTotalPages(1);
+                setTotalElements(0);
             }
         } catch (error) {
             console.error("获取Tips数据失败:", error);
-            // 出错时，也设置一个带列定义的空数据结构
             setTableData({ 
                 data: [], 
                 column: [
@@ -71,11 +76,16 @@ export default function TipsClient() {
                     { key: 'updatedAt', title: '更新时间' },
                 ] 
             });
+            setTotalPages(1);
+            setTotalElements(0);
+        } finally {
+            setLoading(false);
         }
     }
 
     useEffect(() => {
-        fetchData();
+        fetchData(0);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const handleViewTip = (tip: any) => {
@@ -168,7 +178,12 @@ export default function TipsClient() {
                     column={tableData.column || []}
                     onView={handleViewTip}
                     onDelete={handleDeleteTip}
-                    onUpdate={handleOpenUpdateForm} // Pass handler to open form for editing
+                    onUpdate={handleOpenUpdateForm}
+                    page={page}
+                    totalPages={totalPages}
+                    totalElements={totalElements}
+                    onPageChange={(p) => fetchData(p)}
+                    isLoading={loading}
                 />
             </CardBox>
 

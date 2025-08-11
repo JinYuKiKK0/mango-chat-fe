@@ -25,21 +25,23 @@ type Props = {
     column: ColumnDefinition[];
     onView?: (row: RoleRow) => void;
     onDelete?: (roleId: number) => void;
+    page?: number;
+    totalPages?: number;
+    totalElements?: number;
+    onPageChange?: (page: number) => void;
+    isLoading?: boolean;
 };
 
-const RoleTable = ({ data, column, onView, onDelete }: Props) => {
-    const perPage = 10;
+const RoleTable = ({ data, column, onView, onDelete, page = 0, totalPages = 1, totalElements = 0, onPageChange, isLoading = false }: Props) => {
     const [roleTypes, setRoleTypes] = useState<{value: number; label: string}[]>([]);
-
-    const numPages = Math.ceil(data.length / perPage);
-    const pagesList: number[] = Array.from({ length: numPages }, (_, i) => i);
-
-    const [currentPage, setCurrentPage] = useState(0);
-
-    const dataPaginated = data.slice(
-        currentPage * perPage,
-        (currentPage + 1) * perPage
-    );
+    const [pageInput, setPageInput] = useState<string>(String((page ?? 0) + 1));
+    useEffect(() => { setPageInput(String((page ?? 0) + 1)); }, [page]);
+    const canGoPrev = page > 0;
+    const canGoNext = page < Math.max(totalPages - 1, 0);
+    const handleJump = () => {
+        const target = Math.max(1, Math.min(parseInt(pageInput || '1', 10) || 1, Math.max(totalPages, 1)));
+        onPageChange?.(target - 1);
+    };
 
     useEffect(() => {
         fetchRoleTypes();
@@ -75,14 +77,14 @@ const RoleTable = ({ data, column, onView, onDelete }: Props) => {
                 </tr>
                 </thead>
                 <tbody>
-                {dataPaginated.length === 0 ? (
+                {(data?.length ?? 0) === 0 ? (
                     <tr>
                         <td colSpan={6} className="text-center">
-                            暂无角色数据
+                            {isLoading ? '加载中...' : '暂无角色数据'}
                         </td>
                     </tr>
                 ) : (
-                    dataPaginated.map((row, rowIndex) => (
+                    data.map((row, rowIndex) => (
                         <tr key={row.id || rowIndex}>
                             <td data-label="ID">{row.id}</td>
                             <td data-label="角色名称">
@@ -131,23 +133,27 @@ const RoleTable = ({ data, column, onView, onDelete }: Props) => {
 
             <div className="p-3 lg:px-6 border-t border-gray-100 dark:border-slate-800">
                 <div className="flex flex-col md:flex-row items-center justify-between py-3 md:py-0">
-                    {numPages > 1 && (
-                        <Buttons>
-                            {pagesList.map((page) => (
-                                <Button
-                                    key={page}
-                                    active={page === currentPage}
-                                    label={(page + 1).toString()}
-                                    color={page === currentPage ? "lightDark" : "whiteDark"}
-                                    small
-                                    onClick={() => setCurrentPage(page)}
-                                    isGrouped
-                                />
-                            ))}
-                        </Buttons>
-                    )}
+                    <Buttons>
+                        <Button
+                            label="上一页"
+                            color="whiteDark"
+                            small
+                            disabled={!canGoPrev || isLoading}
+                            onClick={() => canGoPrev && onPageChange?.(page - 1)}
+                            isGrouped
+                        />
+                        <Button
+                            label="下一页"
+                            color="whiteDark"
+                            small
+                            disabled={!canGoNext || isLoading}
+                            onClick={() => canGoNext && onPageChange?.(page + 1)}
+                            isGrouped
+                        />
+                        {/* 按需求：角色模块不需要跳页输入 */}
+                    </Buttons>
                     <small className="mt-6 md:mt-0">
-                        第 {currentPage + 1} 页，共 {numPages} 页
+                        第 {page + 1} 页，共 {Math.max(totalPages, 1)} 页（共 {totalElements ?? 0} 条）
                     </small>
                 </div>
             </div>

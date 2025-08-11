@@ -20,13 +20,20 @@ export default function PermissionsClient() {
     const [showModal, setShowModal] = useState(false);
     const [isCreating, setIsCreating] = useState(false);
 
+    const [page, setPage] = useState(0);
+    const [pageSize] = useState(10);
+    const [totalPages, setTotalPages] = useState(1);
+    const [totalElements, setTotalElements] = useState(0);
+    const [loading, setLoading] = useState(false);
+
     useEffect(() => {
-        fetchData();
+        fetchData(0);
     }, []);
 
-    async function fetchData() {
+    async function fetchData(nextPage: number) {
+        setLoading(true);
         try {
-            const response = await getPermissionList();
+            const response = await getPermissionList(nextPage, pageSize);
             console.log("权限数据返回:", response);
 
             if (response.code === 200 && response.data) {
@@ -34,11 +41,16 @@ export default function PermissionsClient() {
                     data: response.data.content || [],
                     column: response.column || []
                 });
+                setPage(response.data.page ?? nextPage);
+                setTotalPages(response.data.totalPages ?? 1);
+                setTotalElements(response.data.totalElements ?? 0);
             } else {
                 console.error("权限数据格式不正确:", response);
             }
         } catch (error) {
             console.error("获取权限数据失败:", error);
+        } finally {
+            setLoading(false);
         }
     }
 
@@ -61,7 +73,7 @@ export default function PermissionsClient() {
     const handleDeletePermission = async (permissionId: number) => {
         try {
             await deletePermission(permissionId);
-            await fetchData();
+            await fetchData(page);
             setShowModal(false);
         } catch (error) {
             console.error("删除权限失败", error);
@@ -75,7 +87,7 @@ export default function PermissionsClient() {
             } else {
                 await updatePermission(permissionData.id, permissionData);
             }
-            await fetchData();
+            await fetchData(page);
             setShowModal(false);
         } catch (error) {
             console.error("保存权限失败", error);
@@ -107,6 +119,11 @@ export default function PermissionsClient() {
                     column={tableData.column || []}
                     onView={handleViewPermission}
                     onDelete={handleDeletePermission}
+                    page={page}
+                    totalPages={totalPages}
+                    totalElements={totalElements}
+                    onPageChange={(p) => fetchData(p)}
+                    isLoading={loading}
                 />
             </CardBox>
 

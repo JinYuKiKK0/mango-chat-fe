@@ -23,15 +23,20 @@ export default function AnnouncementsClient() {
     const [showFormModal, setShowFormModal] = useState(false); // State for AnnouncementForm modal
     const [editingAnnouncement, setEditingAnnouncement] = useState<any>(null); // State for announcement being edited
 
-    const fetchAnnouncements = async () => {
-        try {
-            const response = await getAnnouncementList(); 
-            console.log("公告列表返回:", response);
+    // 分页状态
+    const [page, setPage] = useState(0);
+    const [pageSize] = useState(10);
+    const [totalPages, setTotalPages] = useState(1);
+    const [totalElements, setTotalElements] = useState(0);
+    const [loading, setLoading] = useState(false);
 
-            // 后端返回格式: { code: 200, message: "查询成功", data: { content: [...], page, pageSize, totalElements, totalPages }, column: [...] }
-            if (response && response.code === 200 && response.data && Array.isArray(response.data.content)) {
-                const rawData = response.data.content;
-                // 处理列配置：将后端返回的 column 数组转换为前端期望的格式
+    const fetchAnnouncements = async (nextPage: number) => {
+        setLoading(true);
+        try {
+            const response = await getAnnouncementList(nextPage, pageSize); 
+            // 后端返回格式: { code, data: { content, page, pageSize, totalElements, totalPages }, column }
+            if (response && response.code === 200 && response.data) {
+                const rawData = response.data.content || [];
                 const columns = response.column ? response.column.map((col: any) => ({
                     key: col.column,
                     title: col.value
@@ -39,34 +44,39 @@ export default function AnnouncementsClient() {
                     { key: 'title', title: '标题' },
                     { key: 'createdAt', title: '创建时间' },
                 ];
-
-                // 若某些列在所有数据项中均不存在(值为 undefined 或 null)，则过滤掉这些列
                 const filteredColumns = columns.filter((col: any) =>
                     rawData.some((item: any) => item[col.key] !== undefined && item[col.key] !== null)
                 );
 
-                setTableData({
-                    data: rawData,
-                    column: filteredColumns
-                });
+                setTableData({ data: rawData, column: filteredColumns });
+                setPage(response.data.page ?? nextPage);
+                setTotalPages(response.data.totalPages ?? 1);
+                setTotalElements(response.data.totalElements ?? 0);
             } else {
                 console.error("API 返回格式不正确或无数据:", response);
                 setTableData({ data: [], column: [
                     { key: 'title', title: '标题' },
                     { key: 'createdAt', title: '创建时间' },
-                ] }); // Set empty data with default columns on error
+                ] });
+                setTotalPages(1);
+                setTotalElements(0);
             }
         } catch (error) {
             console.error("获取公告数据失败:", error);
             setTableData({ data: [], column: [
                 { key: 'title', title: '标题' },
                 { key: 'createdAt', title: '创建时间' },
-            ] }); // Set empty data with default columns on error
+            ] });
+            setTotalPages(1);
+            setTotalElements(0);
+        } finally {
+            setLoading(false);
         }
     };
 
     useEffect(() => {
-        fetchAnnouncements();
+        fetchAnnouncements(0);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const handleViewAnnouncement = (announcement: any) => {
@@ -135,7 +145,12 @@ export default function AnnouncementsClient() {
                     column={tableData.column || []}
                     onView={handleViewAnnouncement}
                     onDelete={handleDeleteAnnouncement}
-                    onUpdate={handleOpenUpdateForm} 
+                    onUpdate={handleOpenUpdateForm}
+                    page={page}
+                    totalPages={totalPages}
+                    totalElements={totalElements}
+                    onPageChange={(p) => fetchAnnouncements(p)}
+                    isLoading={loading}
                 />
             </CardBox>
 

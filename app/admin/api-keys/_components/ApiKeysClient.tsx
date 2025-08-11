@@ -21,23 +21,35 @@ export default function ApiKeysClient() {
     const [isCreating, setIsCreating] = useState(false);
     const [newlyCreatedKey, setNewlyCreatedKey] = useState<string | null>(null);
 
+    const [page, setPage] = useState(0);
+    const [pageSize] = useState(10);
+    const [totalPages, setTotalPages] = useState(1);
+    const [totalElements, setTotalElements] = useState(0);
+    const [loading, setLoading] = useState(false);
+
     useEffect(() => {
-        fetchData();
+        fetchData(0);
     }, []);
 
-    async function fetchData() {
+    async function fetchData(nextPage: number) {
+        setLoading(true);
         try {
-            const response = await getApiKeyList();
+            const response = await getApiKeyList(nextPage, pageSize);
             if (response.code === 200 && response.data) {
                 setTableData({
                     data: response.data.content || [],
                     column: response.column || []
                 });
+                setPage(response.data.page ?? nextPage);
+                setTotalPages(response.data.totalPages ?? 1);
+                setTotalElements(response.data.totalElements ?? 0);
             } else {
                 console.error("API Key数据格式不正确:", response);
             }
         } catch (error) {
             console.error("获取API Key失败:", error);
+        } finally {
+            setLoading(false);
         }
     }
 
@@ -58,7 +70,7 @@ export default function ApiKeysClient() {
     const handleDeleteApiKey = async (apiKeyId: number) => {
         try {
             await deleteApiKey(apiKeyId);
-            await fetchData();
+            await fetchData(page);
             setShowModal(false);
         } catch (error) {
             console.error("删除API Key失败", error);
@@ -79,7 +91,7 @@ export default function ApiKeysClient() {
                 await updateApiKey(apiKeyData.id, { name: apiKeyData.name });
                 setShowModal(false);
             }
-            await fetchData();
+            await fetchData(page);
         } catch (error) {
             console.error("保存API Key失败", error);
         }
@@ -115,6 +127,11 @@ export default function ApiKeysClient() {
                     column={tableData.column || []}
                     onView={handleViewApiKey}
                     onDelete={handleDeleteApiKey}
+                    page={page}
+                    totalPages={totalPages}
+                    totalElements={totalElements}
+                    onPageChange={(p) => fetchData(p)}
+                    isLoading={loading}
                 />
             </CardBox>
 

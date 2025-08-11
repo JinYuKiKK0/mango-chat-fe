@@ -20,13 +20,20 @@ export default function RolesClient() {
     const [showModal, setShowModal] = useState(false);
     const [isCreating, setIsCreating] = useState(false);
 
+    const [page, setPage] = useState(0);
+    const [pageSize] = useState(10);
+    const [totalPages, setTotalPages] = useState(1);
+    const [totalElements, setTotalElements] = useState(0);
+    const [loading, setLoading] = useState(false);
+
     useEffect(() => {
-        fetchData();
+        fetchData(0);
     }, []);
 
-    async function fetchData() {
+    async function fetchData(nextPage: number) {
+        setLoading(true);
         try {
-            const response = await getRoleList();
+            const response = await getRoleList(nextPage, pageSize);
             console.log("角色数据返回:", response);
 
             if (response.code === 200 && response.data) {
@@ -34,11 +41,16 @@ export default function RolesClient() {
                     data: response.data.content || [],
                     column: response.column || []
                 });
+                setPage(response.data.page ?? nextPage);
+                setTotalPages(response.data.totalPages ?? 1);
+                setTotalElements(response.data.totalElements ?? 0);
             } else {
                 console.error("角色数据格式不正确:", response);
             }
         } catch (error) {
             console.error("获取角色数据失败:", error);
+        } finally {
+            setLoading(false);
         }
     }
 
@@ -62,7 +74,7 @@ export default function RolesClient() {
     const handleDeleteRole = async (roleId: number) => {
         try {
             await deleteRole(roleId);
-            await fetchData();
+            await fetchData(page);
             setShowModal(false);
         } catch (error) {
             console.error("删除角色失败", error);
@@ -76,7 +88,7 @@ export default function RolesClient() {
             } else {
                 await updateRole(roleData.id, roleData);
             }
-            await fetchData();
+            await fetchData(page);
             setShowModal(false);
         } catch (error) {
             console.error("保存角色失败", error);
@@ -108,6 +120,11 @@ export default function RolesClient() {
                     column={tableData.column || []}
                     onView={handleViewRole}
                     onDelete={handleDeleteRole}
+                    page={page}
+                    totalPages={totalPages}
+                    totalElements={totalElements}
+                    onPageChange={(p) => fetchData(p)}
+                    isLoading={loading}
                 />
             </CardBox>
 

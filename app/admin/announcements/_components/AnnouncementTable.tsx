@@ -3,7 +3,7 @@
 'use client';
 
 import { mdiEye, mdiTrashCan, mdiSquareEditOutline, mdiBullhornVariant } from '@mdi/js';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Buttons from '../../../_components/Buttons';
 import Button from '../../../_components/Button';
 
@@ -13,19 +13,24 @@ interface AnnouncementTableProps {
   onView: (item: any) => void;
   onDelete: (itemId: number) => void;
   onUpdate: (item: any) => void;
+  page?: number;
+  totalPages?: number;
+  totalElements?: number;
+  onPageChange?: (page: number) => void;
+  isLoading?: boolean;
 }
 
-const AnnouncementTable: React.FC<AnnouncementTableProps> = ({ data, column, onView, onDelete, onUpdate }) => {
-  const perPage = 10;
-  const [currentPage, setCurrentPage] = useState(0);
-
-  const dataPaginated = data.slice(
-    currentPage * perPage,
-    (currentPage + 1) * perPage
-  );
-
-  const numPages = Math.ceil(data.length / perPage);
-  const pagesList: number[] = Array.from({ length: numPages }, (_, i) => i);
+const AnnouncementTable: React.FC<AnnouncementTableProps> = ({ data, column, onView, onDelete, onUpdate, page = 0, totalPages = 1, totalElements = 0, onPageChange, isLoading = false }) => {
+  const [pageInput, setPageInput] = useState<string>(String((page ?? 0) + 1));
+  useEffect(() => {
+    setPageInput(String((page ?? 0) + 1));
+  }, [page]);
+  const canGoPrev = page > 0;
+  const canGoNext = page < Math.max(totalPages - 1, 0);
+  const handleJump = () => {
+    const target = Math.max(1, Math.min(parseInt(pageInput || '1', 10) || 1, Math.max(totalPages, 1)));
+    onPageChange?.(target - 1);
+  };
 
   const formatDate = (dateString?: string) => {
     if (!dateString) return '-';
@@ -44,7 +49,7 @@ const AnnouncementTable: React.FC<AnnouncementTableProps> = ({ data, column, onV
   };
 
   if (!data || data.length === 0) {
-    return <p className="text-center text-gray-500 py-4">暂无公告数据</p>;
+    return <p className="text-center text-gray-500 py-4">{isLoading ? '加载中...' : '暂无公告数据'}</p>;
   }
 
   return (
@@ -59,7 +64,7 @@ const AnnouncementTable: React.FC<AnnouncementTableProps> = ({ data, column, onV
           </tr>
         </thead>
         <tbody>
-          {dataPaginated.map((item) => (
+          {data.map((item) => (
             <tr key={item.id}>
               {column.map((col) => (
                 <td key={col.key} data-label={col.title}>
@@ -110,23 +115,41 @@ const AnnouncementTable: React.FC<AnnouncementTableProps> = ({ data, column, onV
 
       <div className="p-3 lg:px-6 border-t border-gray-100 dark:border-slate-800">
         <div className="flex flex-col md:flex-row items-center justify-between py-3 md:py-0">
-          {numPages > 1 && (
-            <Buttons>
-              {pagesList.map((page) => (
-                <Button
-                  key={page}
-                  active={page === currentPage}
-                  label={(page + 1).toString()}
-                  color={page === currentPage ? "lightDark" : "whiteDark"}
-                  small
-                  onClick={() => setCurrentPage(page)}
-                  isGrouped
-                />
-              ))}
-            </Buttons>
-          )}
+          <Buttons>
+            <Button
+              label="上一页"
+              color="whiteDark"
+              small
+              disabled={!canGoPrev || isLoading}
+              onClick={() => canGoPrev && onPageChange?.(page - 1)}
+              isGrouped
+            />
+            <Button
+              label="下一页"
+              color="whiteDark"
+              small
+              disabled={!canGoNext || isLoading}
+              onClick={() => canGoNext && onPageChange?.(page + 1)}
+              isGrouped
+            />
+            <span className="mx-2 text-sm mb-3">跳转到</span>
+            <input
+              className="border rounded px-2 py-1 w-16 text-sm mr-2 mb-3"
+              value={pageInput}
+              onChange={(e) => setPageInput(e.target.value)}
+              onKeyDown={(e) => { if (e.key === 'Enter') handleJump(); }}
+            />
+            <Button
+              label="跳转"
+              color="whiteDark"
+              small
+              disabled={isLoading}
+              onClick={handleJump}
+              isGrouped
+            />
+          </Buttons>
           <small className="mt-6 md:mt-0">
-            第 {currentPage + 1} 页，共 {numPages} 页
+            第 {page + 1} 页，共 {Math.max(totalPages, 1)} 页（共 {totalElements ?? 0} 条）
           </small>
         </div>
       </div>

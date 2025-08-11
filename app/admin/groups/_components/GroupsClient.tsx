@@ -20,13 +20,20 @@ export default function GroupsClient() {
     const [showModal, setShowModal] = useState(false);
     const [isCreating, setIsCreating] = useState(false);
 
+    const [page, setPage] = useState(0);
+    const [pageSize] = useState(10);
+    const [totalPages, setTotalPages] = useState(1);
+    const [totalElements, setTotalElements] = useState(0);
+    const [loading, setLoading] = useState(false);
+
     useEffect(() => {
-        fetchData();
+        fetchData(0);
     }, []);
 
-    async function fetchData() {
+    async function fetchData(nextPage: number) {
+        setLoading(true);
         try {
-            const response = await getUserGroupList();
+            const response = await getUserGroupList(nextPage, pageSize);
             console.log("群组数据返回:", response);
 
             if (response.code === 200 && response.data) {
@@ -34,11 +41,16 @@ export default function GroupsClient() {
                     data: response.data.content || [],
                     column: response.column || []
                 });
+                setPage(response.data.page ?? nextPage);
+                setTotalPages(response.data.totalPages ?? 1);
+                setTotalElements(response.data.totalElements ?? 0);
             } else {
                 console.error("群组数据格式不正确:", response);
             }
         } catch (error) {
             console.error("获取群组数据失败:", error);
+        } finally {
+            setLoading(false);
         }
     }
 
@@ -60,7 +72,7 @@ export default function GroupsClient() {
     const handleDeleteGroup = async (groupId: number) => {
         try {
             await deleteUserGroup(groupId);
-            await fetchData();
+            await fetchData(page);
             setShowModal(false);
         } catch (error) {
             console.error("删除群组失败", error);
@@ -74,7 +86,7 @@ export default function GroupsClient() {
             } else {
                 await updateUserGroup(groupData.id, groupData);
             }
-            await fetchData();
+            await fetchData(page);
             setShowModal(false);
         } catch (error) {
             console.error("保存群组失败", error);
@@ -106,6 +118,11 @@ export default function GroupsClient() {
                     column={tableData.column || []}
                     onView={handleViewGroup}
                     onDelete={handleDeleteGroup}
+                    page={page}
+                    totalPages={totalPages}
+                    totalElements={totalElements}
+                    onPageChange={(p) => fetchData(p)}
+                    isLoading={loading}
                 />
             </CardBox>
 
