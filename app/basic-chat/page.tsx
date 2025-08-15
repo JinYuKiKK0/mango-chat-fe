@@ -45,10 +45,13 @@ export default function BasicChatPage() {
     /**
      * 对话详情
      */
-    const [ conversationDetailData,  setConversationDetailData] = useState<ConversationDetailData>();
+    const [ conversationDetailData,  setConversationDetailData] = useState<ConversationDetailData | null>(null);
     const [messages, setMessages] = useState<ChatMessage[]>([]);
     useEffect(() => {
-        if (!sessionId) return;
+        if (!sessionId) {
+            setConversationDetailData(null);
+            setMessages([])
+        }
         const fetchData = async () => {
             const result = await getConversationDetails(getCurrentUserId()!,sessionId)
             setConversationDetailData(result.data)
@@ -161,7 +164,7 @@ export default function BasicChatPage() {
             if (messages[messages.length-1].content === "") {
                 console.error("Error handling stream chat: 返回为空");
                 const errorMessage: ChatMessage = { role: "assistant", content: "抱歉，处理您的请求时发生了一个错误。" };
-                setMessages(prev => [...prev.slice(0, -1)], errorMessage);
+                setMessages(prev => [...prev.slice(0, -1), errorMessage]);
             }
             setIsGettingResponse(false);
             setCurrentNodeStatus(null);
@@ -169,20 +172,27 @@ export default function BasicChatPage() {
     };
 
 
-    function handleConversationClick(id: number) {
+    function handleConversationClick(id: number | null) {
         const params = new URLSearchParams(searchParams.toString());
-        params.set("sessionId", id.toString());
+        if (id){
+            params.set("sessionId", id.toString());
+        }else {
+            params.delete("sessionId");
+        }
         window.history.pushState(null, '', `?${params.toString()}`);
     }
 
     return (
-        <Box display="flex" minHeight="90vh">
+        <Box display="flex" height="90vh">
             <div className="w-1/5 bg-gray-50 dark:bg-slate-800 dark:text-slate-100 p-4 overflow-auto border-r">
-                <Box>
-                    <Typography variant="h6" gutterBottom>
+                <Box className={"flex flex-col items-center"}>
+                    <Typography variant="h6" className={"text-center"} gutterBottom>
                         历史会话
                     </Typography>
-                    <Divider />
+                    <Button onClick={() => handleConversationClick(null)}>
+                        发起新对话
+                    </Button>
+                    <Divider></Divider>
                     <List>
                         {conversationList.map((item, index) => (
                             <ListItem disablePadding key={index} onClick={() => handleConversationClick(item.id)}>
@@ -229,7 +239,7 @@ export default function BasicChatPage() {
                             onKeyDown={(e) => e.key === "Enter" && handleSend()}
                             disabled={isGettingResponse}
                         />
-                        <Button variant="contained" onClick={handleSend} disabled={isGettingResponse}>发送</Button>
+                        <Button variant="contained" className={"inline whitespace-nowrap"} onClick={handleSend} disabled={isGettingResponse}>{sessionId ? "发送" : "发起新对话"}</Button>
                     </Box>
                 </Box>
             </div>
