@@ -1,14 +1,14 @@
 import {API_BASE_URL} from "./api"
-import { clearUserData } from "../_lib/userUtils"
+import {clearUserData, getCurrentUserId} from "../_lib/userUtils"
 
-const getAuthToken = () => {
+export const getAuthToken = () => {
     // 在客户端代码中访问 localStorage
     if (typeof window !== 'undefined') {
-        return localStorage.getItem('authToken');
+        return localStorage.getItem('authToken') ?? undefined;
     }
-    return null;
+    return undefined;
 };
-
+getCurrentUserId()
 const setAuthToken = (token: string): void => {
     if (typeof window !== 'undefined') {
         localStorage.setItem('authToken', token);
@@ -21,7 +21,10 @@ const removeAuthToken = (): void => {
     }
 };
 
-export async function authenticatedFetch(url: string, options: RequestInit = {}): Promise<any> {
+interface AuthenticatedFetchOptions extends RequestInit {
+    responseType?: 'json' | 'stream';
+}
+export async function authenticatedFetch(url: string, options: AuthenticatedFetchOptions = {}): Promise<any> {
     const token = getAuthToken();
 
     const headers = new Headers(options.headers);
@@ -70,6 +73,11 @@ export async function authenticatedFetch(url: string, options: RequestInit = {})
             const error = new Error(`API Error ${response.status}: ${errorDetail}`);
             (error as any).response = response; // 附加原始响应对象，以便更详细处理
             throw error;
+        }
+
+        if (options.responseType === 'stream') {
+            // 如果是流式请求，直接返回原始响应
+            return response;
         }
 
         // 默认情况下，返回解析后的 JSON 数据

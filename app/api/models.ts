@@ -52,7 +52,8 @@ type ResetPasswordRequest = {
  */
 type StreamChatRequest = {
     message: string;
-    conversation_id: string; // 留空以开启新会话
+    conversation_id?: string; // 留空以开启新会话
+    // user: string;
 };
 
 /**

@@ -268,6 +268,7 @@ export interface DeleteUser0Request {
 export interface GetAllContextsRequest {
     lastSessionId?: number;
     pageSize?: number;
+    userId?: number;
     authorization?: string;
 }
 

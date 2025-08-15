@@ -113,8 +113,10 @@ export async function startStreamChat(data: StreamChatRequest): Promise<Response
         method: 'POST',
         headers: {
             'Accept': 'text/event-stream', // 对 SSE 很重要
+            'Content-Type': 'application/json'
         },
         body: JSON.stringify(data),
+        responseType: "stream"
     });
 }
 
@@ -137,7 +139,7 @@ export async function getRateLimitReminder(userId: string): Promise<RateLimitRem
  * @param {number} [pageSize=10] - 每页的项目数。
  * @returns {Promise<ConversationListResponse>} 分页的会话标题列表。
  */
-export async function getConversationList(userId: string, lastSessionId?: number, pageSize: number = 10): Promise<ConversationListResponse> {
+export async function getConversationList(userId: number, lastSessionId?: number, pageSize: number = 10): Promise<ConversationListResponse> {
     let url = `/api/chat/list?user_id=${encodeURIComponent(userId)}&page_size=${pageSize}`;
     if (lastSessionId) {
         url += `&lastSessionId=${lastSessionId}`;
@@ -153,7 +155,7 @@ export async function getConversationList(userId: string, lastSessionId?: number
  * @param {number} sessionId - 会话的 ID。
  * @returns {Promise<BaseResponse<ConversationDetailData>>} 会话的详细信息和上下文。
  */
-export async function getConversationDetails(userId: string, sessionId: number): Promise<BaseResponse<ConversationDetailData>> {
+export async function getConversationDetails(userId: number, sessionId: number): Promise<BaseResponse<ConversationDetailData>> {
     const url = `/api/chat/info?user_id=${encodeURIComponent(userId)}&session_id=${sessionId}`;
     return authenticatedFetch(url, {
         method: 'GET',
