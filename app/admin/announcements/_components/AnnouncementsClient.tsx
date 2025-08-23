@@ -88,7 +88,7 @@ export default function AnnouncementsClient() {
         if (window.confirm('确定要删除此公告吗?')) {
             try {
                 await deleteAnnouncement(announcementId);
-                fetchAnnouncements(); // Refresh data
+                // await fetchAnnouncements(); // Refresh data
                 setShowDetailModal(false); // Close detail modal if open
                 console.log(`Deleted announcement ${announcementId}`);
             } catch (error) {
@@ -113,7 +113,7 @@ export default function AnnouncementsClient() {
                 await createAnnouncement(formData);
                 console.log('Created new announcement');
             }
-            fetchAnnouncements(); // Refresh data
+            // await fetchAnnouncements(); // Refresh data
             setShowFormModal(false);
             setEditingAnnouncement(null);
         } catch (error) {

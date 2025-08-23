@@ -104,7 +104,7 @@ export function useConversationListQuery(userId: number, lastSessionId?: number,
  * @param {string} userId - 用户的 ID
  * @param {number} sessionId - 会话的 ID
  */
-export function useConversationDetailsQuery(userId: string, sessionId: number) {
+export function useConversationDetailsQuery(userId: number, sessionId: number) {
     return useQuery({
         queryKey: ['conversationDetails', userId, sessionId],
         queryFn: () => getConversationDetails(userId, sessionId),

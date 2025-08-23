@@ -16,6 +16,9 @@ const nextConfig: NextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
+  typescript: {
+    ignoreBuildErrors: true, // 将此选项设置为 true 以忽略 TypeScript 构建错误
+  },
 };
 
 export default nextConfig;

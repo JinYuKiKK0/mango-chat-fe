@@ -15,8 +15,8 @@ import {
     ListItemButton,
     Chip
 } from "@mui/material";
-import {getCurrentUserId, getLoginData} from "../_lib/userUtils";
-import {getConversationDetails, getConversationList, getUserSelfInfo, startStreamChat} from "../api/api";
+import {getCurrentUserId} from "../_lib/userUtils";
+import {getConversationDetails, getConversationList, startStreamChat} from "../api/api";
 import {useSearchParams} from "next/navigation";
 
 interface NodeStatus {
@@ -25,8 +25,30 @@ interface NodeStatus {
     index: number;
 }
 
+// app/basic-chat/page.tsx
+import { Suspense } from 'react';
+import { CircularProgress } from '@mui/material';
 
-export default function BasicChatPage() {
+// A simple loading component to show as a fallback
+function ChatLoading() {
+    return (
+        <Box display="flex" justifyContent="center" alignItems="center" height="90vh">
+            <CircularProgress />
+            <p style={{ marginLeft: '1rem' }}>Loading Chat...</p>
+        </Box>
+    );
+}
+
+export default function Page() {
+    return (
+        <Suspense fallback={<ChatLoading />}>
+            <BasicChatPage />
+        </Suspense>
+    );
+}
+
+
+function BasicChatPage() {
     const searchParams = useSearchParams();
     const sessionId = Number(searchParams.get("sessionId"));
 

@@ -141,7 +141,7 @@ export default function TipsClient() {
                 await createTip(formData);
                 console.log('Created new tip');
             }
-            fetchData(); // Refresh data
+            // fetchData(); // Refresh data
             setShowFormModal(false);
             setEditingTip(null);
         } catch (error) {
